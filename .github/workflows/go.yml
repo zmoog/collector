@@ -1,14 +1,11 @@
 name: Receiver Tests
 
 on:
-  push:
-    paths:
-      - 'receiver/**'
-      - '.github/workflows/**'
-    branches: [ main ]
   pull_request:
     paths:
       - 'receiver/**'
+      - 'extension/**'
+      - 'processor/**'
       - '.github/workflows/**'
     branches: [ main ]
 
@@ -25,7 +22,7 @@ jobs:
         with:
           go-version: '1.24'
       - id: set-modules
-        run: echo "modules=$(go list -m -json | jq -s '.' | jq -c '[.[].Dir]')" >> $GITHUB_OUTPUT    
+        run: echo "modules=$(go list -m -json | jq -s 'map(select(.Path | contains("github.com/zmoog/otel-collector-contrib/tools") | not)) | .' | jq -c '[.[].Dir]')" >> $GITHUB_OUTPUT    
   
   golangci-lint:
     needs: detect-modules
