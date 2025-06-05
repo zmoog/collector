@@ -41,9 +41,9 @@ staticcheck:
 fmt:
 	go tool goimports -local github.com/zmoog/ -w .
 
-.PHONY: generate-otelcol
-generate-otelcol:
-	cd collector && go tool builder --config builder-config.yaml
+.PHONY: collector-source
+collector-source:
+	cd collector && go run go.opentelemetry.io/collector/cmd/builder@v0.127.0 --config ./builder-config.yaml
 
 .PHONY: run
 run:
