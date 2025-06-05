@@ -1,14 +1,11 @@
 name: Receiver Tests
 
 on:
-  push:
-    paths:
-      - 'receiver/**'
-      - '.github/workflows/**'
-    branches: [ main ]
   pull_request:
     paths:
       - 'receiver/**'
+      - 'extension/**'
+      - 'processor/**'
       - '.github/workflows/**'
     branches: [ main ]
 
