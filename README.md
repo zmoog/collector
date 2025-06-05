@@ -1,3 +1,3 @@
-# otel-collector-contrib
+# collector
 
 Personal collection of OTel Collector related projects.

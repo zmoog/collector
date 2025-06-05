@@ -1,4 +1,4 @@
-module github.com/zmoog/otel-collector-contrib/receiver/toggltrackreceiver
+module github.com/zmoog/collector/receiver/toggltrackreceiver
 
 go 1.24.0
 

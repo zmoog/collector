@@ -1,4 +1,4 @@
-module github.com/zmoog/otel-collector-contrib/receiver/wavinsentioreceiver
+module github.com/zmoog/collector/receiver/wavinsentioreceiver
 
 go 1.24.0
 

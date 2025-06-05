@@ -1,5 +1,5 @@
 type: wavinsentio
-scope_name: github.com/zmoog/otel-collector-contrib/wavinsentio
+scope_name: github.com/zmoog/collector/wavinsentio
 
 status:
   class: receiver

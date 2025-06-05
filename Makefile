@@ -5,7 +5,7 @@ SERVICE_NAME    := otel-collector
 SERVICE_VERSION := 0.5-$(shell git rev-parse --short HEAD)
 SERVICE_IMAGE   := $(BASE_IMAGE_NAME)/$(SERVICE_NAME):$(SERVICE_VERSION)
 
-KO_DOCKER_REPO  := ghcr.io/zmoog/otel-collector-contrib
+KO_DOCKER_REPO  := ghcr.io/zmoog/collector
 
 # ==============================================================================
 # Define targets

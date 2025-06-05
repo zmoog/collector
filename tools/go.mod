@@ -1,4 +1,4 @@
-module github.com/zmoog/otel-collector-contrib/tools
+module github.com/zmoog/collector/tools
 
 go 1.24.0
 

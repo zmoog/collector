@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	scopeName   = "github.com/zmoog/otel-collector-contrib/receiver/toggltrackreceiver"
+	scopeName   = "github.com/zmoog/collector/receiver/toggltrackreceiver"
 	scopeVerion = "v0.1.0"
 )
 

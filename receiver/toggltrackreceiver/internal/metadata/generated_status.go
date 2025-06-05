@@ -8,7 +8,7 @@ import (
 
 var (
 	Type      = component.MustNewType("toggltrack")
-	ScopeName = "github.com/zmoog/otel-collector-contrib/toggltrack"
+	ScopeName = "github.com/zmoog/collector/toggltrack"
 )
 
 const (
