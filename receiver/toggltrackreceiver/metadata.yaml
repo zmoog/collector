@@ -1,5 +1,5 @@
 type: toggltrack
-scope_name: github.com/zmoog/otel-collector-contrib/toggltrack
+scope_name: github.com/zmoog/collector/toggltrack
 
 status:
   class: receiver

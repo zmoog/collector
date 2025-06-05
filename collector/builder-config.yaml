@@ -1,6 +1,6 @@
 # builder-config.yaml
 dist:
-  module: github.com/zmoog/otel-collector-contrib/collector/otelcol
+  module: github.com/zmoog/collector/collector/otelcol
   name: otelcol
   description: OTel Collector distribution
   output_path: ./otelcol
@@ -18,17 +18,17 @@ processors:
 
 receivers:
   - gomod:
-      github.com/zmoog/otel-collector-contrib/receiver/toggltrackreceiver v0.127.0
+      github.com/zmoog/collector/receiver/toggltrackreceiver v0.127.0
   - gomod:
-      github.com/zmoog/otel-collector-contrib/receiver/zcsazzurroreceiver v0.127.0
+      github.com/zmoog/collector/receiver/zcsazzurroreceiver v0.127.0
   - gomod:
-      github.com/zmoog/otel-collector-contrib/receiver/wavinsentioreceiver v0.127.0
+      github.com/zmoog/collector/receiver/wavinsentioreceiver v0.127.0
 
 extensions:
   - gomod:
       github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension v0.127.0
 
 replaces:
-  - github.com/zmoog/otel-collector-contrib/receiver/toggltrackreceiver v0.127.0 => ../../receiver/toggltrackreceiver
-  - github.com/zmoog/otel-collector-contrib/receiver/wavinsentioreceiver v0.127.0 => ../../receiver/wavinsentioreceiver
-  - github.com/zmoog/otel-collector-contrib/receiver/zcsazzurroreceiver v0.127.0 => ../../receiver/zcsazzurroreceiver
+  - github.com/zmoog/collector/receiver/toggltrackreceiver v0.127.0 => ../../receiver/toggltrackreceiver
+  - github.com/zmoog/collector/receiver/wavinsentioreceiver v0.127.0 => ../../receiver/wavinsentioreceiver
+  - github.com/zmoog/collector/receiver/zcsazzurroreceiver v0.127.0 => ../../receiver/zcsazzurroreceiver

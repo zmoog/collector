@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	scopeName   = "github.com/zmoog/otel-collector-contrib/receiver/zcsazzurroreceiver"
+	scopeName   = "github.com/zmoog/collector/receiver/zcsazzurroreceiver"
 	scopeVerion = "v0.1.0"
 )
 

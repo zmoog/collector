@@ -8,7 +8,7 @@ import (
 
 var (
 	Type      = component.MustNewType("wavinsentio")
-	ScopeName = "github.com/zmoog/otel-collector-contrib/wavinsentio"
+	ScopeName = "github.com/zmoog/collector/wavinsentio"
 )
 
 const (

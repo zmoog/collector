@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	scopeName   = "github.com/zmoog/otel-collector-contrib/receiver/wavinsentioreceiver"
+	scopeName   = "github.com/zmoog/collector/receiver/wavinsentioreceiver"
 	scopeVerion = "v0.1.0"
 )
 

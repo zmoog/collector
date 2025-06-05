@@ -14,9 +14,9 @@ import (
 	elasticsearchexporter "github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	basicauthextension "github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension"
 	batchprocessor "go.opentelemetry.io/collector/processor/batchprocessor"
-	toggltrackreceiver "github.com/zmoog/otel-collector-contrib/receiver/toggltrackreceiver"
-	zcsazzurroreceiver "github.com/zmoog/otel-collector-contrib/receiver/zcsazzurroreceiver"
-	wavinsentioreceiver "github.com/zmoog/otel-collector-contrib/receiver/wavinsentioreceiver"
+	toggltrackreceiver "github.com/zmoog/collector/receiver/toggltrackreceiver"
+	zcsazzurroreceiver "github.com/zmoog/collector/receiver/zcsazzurroreceiver"
+	wavinsentioreceiver "github.com/zmoog/collector/receiver/wavinsentioreceiver"
 )
 
 func components() (otelcol.Factories, error) {
@@ -41,9 +41,9 @@ func components() (otelcol.Factories, error) {
 		return otelcol.Factories{}, err
 	}
 	factories.ReceiverModules = make(map[component.Type]string, len(factories.Receivers))
-	factories.ReceiverModules[toggltrackreceiver.NewFactory().Type()] = "github.com/zmoog/otel-collector-contrib/receiver/toggltrackreceiver v0.127.0"
-	factories.ReceiverModules[zcsazzurroreceiver.NewFactory().Type()] = "github.com/zmoog/otel-collector-contrib/receiver/zcsazzurroreceiver v0.127.0"
-	factories.ReceiverModules[wavinsentioreceiver.NewFactory().Type()] = "github.com/zmoog/otel-collector-contrib/receiver/wavinsentioreceiver v0.127.0"
+	factories.ReceiverModules[toggltrackreceiver.NewFactory().Type()] = "github.com/zmoog/collector/receiver/toggltrackreceiver v0.127.0"
+	factories.ReceiverModules[zcsazzurroreceiver.NewFactory().Type()] = "github.com/zmoog/collector/receiver/zcsazzurroreceiver v0.127.0"
+	factories.ReceiverModules[wavinsentioreceiver.NewFactory().Type()] = "github.com/zmoog/collector/receiver/wavinsentioreceiver v0.127.0"
 
 	factories.Exporters, err = otelcol.MakeFactoryMap[exporter.Factory](
 		debugexporter.NewFactory(),

@@ -8,7 +8,7 @@ import (
 
 var (
 	Type      = component.MustNewType("zcsazzurro")
-	ScopeName = "github.com/zmoog/otel-collector-contrib/zcsazzurro"
+	ScopeName = "github.com/zmoog/collector/zcsazzurro"
 )
 
 const (

@@ -1,5 +1,5 @@
 type: zcsazzurro
-scope_name: github.com/zmoog/otel-collector-contrib/zcsazzurro
+scope_name: github.com/zmoog/collector/zcsazzurro
 
 status:
   class: receiver

@@ -1,3 +1,3 @@
-# otel-collector-contrib
+# Collector
 
-Personal collection of OTel Collector related projects.
+Custom stripped-down build of the OpenTelemetry collector for personal projects.

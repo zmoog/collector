@@ -1,4 +1,4 @@
-module github.com/zmoog/otel-collector-contrib/receiver/zcsazzurroreceiver
+module github.com/zmoog/collector/receiver/zcsazzurroreceiver
 
 go 1.24.0
 
