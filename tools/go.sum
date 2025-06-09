@@ -433,6 +433,7 @@ go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJyS
 go.opentelemetry.io/auto/sdk v1.1.0/go.mod h1:3wSPjt5PWp2RhlCcmmOial7AvC4DQqZb7a7wCow3W8A=
 go.opentelemetry.io/collector/cmd/builder v0.127.0 h1:yStYxHrj2I+C1R27iGd6VcXRjn236IsSDukebu7Xsj8=
 go.opentelemetry.io/collector/cmd/builder v0.127.0/go.mod h1:Pa+tZZ6Kl009Uv7hnIiJxjZ8ME54Mdfu4mhsuvoJw+0=
+go.opentelemetry.io/collector/cmd/builder v0.128.0/go.mod h1:Pa+tZZ6Kl009Uv7hnIiJxjZ8ME54Mdfu4mhsuvoJw+0=
 go.opentelemetry.io/collector/cmd/mdatagen v0.127.0 h1:E3qetjHe4KLBtVjmIZkk7yGjkqH1RPzxt5WlgcxnAF4=
 go.opentelemetry.io/collector/cmd/mdatagen v0.127.0/go.mod h1:l50vnC+IRWJ3ZovYr6xoqtr7MjpuKMliWd+DUORk9P0=
 go.opentelemetry.io/collector/component v1.33.0 h1:AoP5ZGEU7Q3YDYQx2CgYy82Xmy3gLgh1WCMeLtTXXFo=
