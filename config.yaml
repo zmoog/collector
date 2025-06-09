@@ -52,5 +52,8 @@ service:
       # exporters: [elasticsearch, debug]
       exporters: [elasticsearch]
   telemetry:
+    resource:
+      service.name: "collector"
     logs:
       level: debug
+      encoding: json
