@@ -43,14 +43,15 @@ fmt:
 
 .PHONY: collector-source
 collector-source:
-	cd collector && go run go.opentelemetry.io/collector/cmd/builder@v0.127.0 --config ./builder-config.yaml
+	cd collector && go run go.opentelemetry.io/collector/cmd/builder@v0.128.0 --config ./builder-config.yaml
 
 .PHONY: run
 run:
-	cd collector/otelcol && ./otelcol --config ../../config.yaml
+	# cd collector && ./otelcol --config ../config.yaml
+	go run ./collector --config config.yaml
 
 .PHONY: service
 service:
-	cd collector/otelcol && KO_DOCKER_REPO=$(KO_DOCKER_REPO) go tool ko build . \
+	cd collector && KO_DOCKER_REPO=$(KO_DOCKER_REPO) go tool ko build . \
 		--platform=linux/amd64,linux/arm64 \
 		--bare
