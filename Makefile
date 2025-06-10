@@ -28,8 +28,7 @@ generate:
 	# look inside the receiver directory
 	# and run mdatagen against the metadata.yaml
 	# found there
-	find receiver -name go.mod -execdir go tool mdatagen metadata.yaml \;
-	find receiver -name go.mod -execdir go mod tidy \;
+	find receiver -name go.mod -execdir sh -c 'go tool mdatagen metadata.yaml && go mod tidy' \;
 
 .PHONY: staticcheck
 staticcheck:
