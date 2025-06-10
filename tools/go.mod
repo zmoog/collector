@@ -134,14 +134,14 @@ require (
 	github.com/vbatts/tar-split v0.12.1 // indirect
 	go.mongodb.org/mongo-driver v1.17.3 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
-	go.opentelemetry.io/collector/cmd/builder v0.127.0 // indirect
-	go.opentelemetry.io/collector/cmd/mdatagen v0.127.0 // indirect
+	go.opentelemetry.io/collector/cmd/builder v0.128.0 // indirect
+	go.opentelemetry.io/collector/cmd/mdatagen v0.128.0 // indirect
 	go.opentelemetry.io/collector/component v1.33.0 // indirect
 	go.opentelemetry.io/collector/confmap v1.33.0 // indirect
 	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.33.0 // indirect
 	go.opentelemetry.io/collector/featuregate v1.33.0 // indirect
-	go.opentelemetry.io/collector/filter v0.127.0 // indirect
-	go.opentelemetry.io/collector/internal/telemetry v0.127.0 // indirect
+	go.opentelemetry.io/collector/filter v0.128.0 // indirect
+	go.opentelemetry.io/collector/internal/telemetry v0.128.0 // indirect
 	go.opentelemetry.io/collector/pdata v1.33.0 // indirect
 	go.opentelemetry.io/contrib/bridges/otelzap v0.10.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.60.0 // indirect
