@@ -33,7 +33,7 @@ func createMetricsReceiver(ctx context.Context, settings receiver.Settings, base
 		consumer:  consumer,
 		config:    &config,
 		scraper:   scraper,
-		marshaler: &azzurroRealtimeDataMarshaler{logger: logger},
+		marshaler: newAzzurroRealtimeDataMarshaler(logger),
 	}
 
 	return &rcvr, nil

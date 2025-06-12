@@ -3,6 +3,7 @@ package zcsazzurroreceiver
 import (
 	"encoding/json"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -30,14 +31,18 @@ func TestAzzurroRealtimeDataMarshaler_UnmarshalMetrics(t *testing.T) {
 
 	// Test successful response
 	t.Run("successful response", func(t *testing.T) {
-		metrics, err := marshaler.UnmarshalMetrics(response)
+		// Extract the first device from the response
+		deviceKey := "my-serial-number"
+		deviceMetrics := response.RealtimeData.Params.Value[0][deviceKey]
+		
+		metrics, err := marshaler.UnmarshalMetrics(deviceKey, deviceMetrics)
 		require.NoError(t, err)
 
 		// Verify metrics structure
 		assert.Equal(t, 1, metrics.ResourceMetrics().Len(), "Should have 1 resource metric")
 
 		resourceMetrics := metrics.ResourceMetrics().At(0)
-		
+
 		// Verify resource attributes
 		resource := resourceMetrics.Resource()
 		thingKey, exists := resource.Attributes().Get("thing_key")
@@ -47,7 +52,7 @@ func TestAzzurroRealtimeDataMarshaler_UnmarshalMetrics(t *testing.T) {
 		// Verify scope metrics
 		assert.Equal(t, 1, resourceMetrics.ScopeMetrics().Len(), "Should have 1 scope metric")
 		scopeMetrics := resourceMetrics.ScopeMetrics().At(0)
-		
+
 		scope := scopeMetrics.Scope()
 		assert.Equal(t, scopeName, scope.Name())
 		assert.Equal(t, scopeVersion, scope.Version())
@@ -110,14 +115,15 @@ func TestAzzurroRealtimeDataMarshaler_UnmarshalMetrics(t *testing.T) {
 		}
 	})
 
-	// Test failed response
-	t.Run("failed response", func(t *testing.T) {
-		failedResponse := azzurro.RealtimeDataResponse{}
-		failedResponse.RealtimeData.Success = false
-
-		metrics, err := marshaler.UnmarshalMetrics(failedResponse)
+	// Test empty response
+	t.Run("empty response", func(t *testing.T) {
+		// Create empty metrics
+		emptyMetrics := azzurro.InverterMetrics{}
+		
+		metrics, err := marshaler.UnmarshalMetrics("test-device", emptyMetrics)
 		require.NoError(t, err)
-		assert.Equal(t, 0, metrics.ResourceMetrics().Len(), "Should have no metrics for failed response")
+		// Should still create metrics even with empty data
+		assert.Equal(t, 1, metrics.ResourceMetrics().Len(), "Should have 1 resource metric even for empty data")
 	})
 }
 
@@ -135,7 +141,11 @@ func TestAzzurroRealtimeDataMarshaler_MetricValues(t *testing.T) {
 	logger := zap.NewNop()
 	marshaler := &azzurroRealtimeDataMarshaler{logger: logger}
 
-	metrics, err := marshaler.UnmarshalMetrics(response)
+	// Extract the first device from the response
+	deviceKey := "my-serial-number"
+	deviceMetrics := response.RealtimeData.Params.Value[0][deviceKey]
+	
+	metrics, err := marshaler.UnmarshalMetrics(deviceKey, deviceMetrics)
 	require.NoError(t, err)
 
 	resourceMetrics := metrics.ResourceMetrics().At(0)
@@ -175,62 +185,37 @@ func TestAzzurroRealtimeDataMarshaler_MetricValues(t *testing.T) {
 }
 
 func TestAzzurroRealtimeDataMarshaler_Timestamp(t *testing.T) {
-	// Create a test response with known timestamp
+	// Create test metrics with known timestamp
 	testTime := time.Date(2024, 10, 22, 19, 46, 52, 0, time.UTC)
-	response := azzurro.RealtimeDataResponse{}
-	response.RealtimeData.Success = true
-	response.RealtimeData.Params.Value = []map[string]struct {
-		EnergyDischargingTotal float64   `json:"energyDischargingTotal"`
-		PowerExporting         float64   `json:"powerExporting"`
-		EnergyExportingTotal   float64   `json:"energyExportingTotal"`
-		EnergyDischarging      float64   `json:"energyDischarging"`
-		BatteryCycletime       int       `json:"batteryCycletime"`
-		LastUpdate             time.Time `json:"lastUpdate"`
-		EnergyGenerating       float64   `json:"energyGenerating"`
-		EnergyAutoconsumingTotal float64 `json:"energyAutoconsumingTotal"`
-		EnergyImporting        float64   `json:"energyImporting"`
-		EnergyCharging         float64   `json:"energyCharging"`
-		PowerImporting         float64   `json:"powerImporting"`
-		EnergyChargingTotal    float64   `json:"energyChargingTotal"`
-		EnergyConsumingTotal   float64   `json:"energyConsumingTotal"`
-		EnergyAutoconsuming    float64   `json:"energyAutoconsuming"`
-		PowerConsuming         float64   `json:"powerConsuming"`
-		EnergyConsuming        float64   `json:"energyConsuming"`
-		PowerGenerating        float64   `json:"powerGenerating"`
-		EnergyImportingTotal   float64   `json:"energyImportingTotal"`
-		EnergyExporting        float64   `json:"energyExporting"`
-		BatterySoC             int       `json:"batterySoC"`
-		ThingFind              string    `json:"thingFind"`
-		PowerAutoconsuming     float64   `json:"powerAutoconsuming"`
-		PowerCharging          float64   `json:"powerCharging"`
-		EnergyGeneratingTotal  float64   `json:"energyGeneratingTotal"`
-		PowerDischarging       float64   `json:"powerDischarging"`
-	}{
-		{
-			"test-device": {
-				LastUpdate:          testTime,
-				PowerImporting:      100.0,
-				BatterySoC:          50,
-				EnergyAutoconsuming: 10.5,
-			},
-		},
+	testMetrics := azzurro.InverterMetrics{
+		LastUpdate:          testTime,
+		PowerImporting:      100.0,
+		BatterySoC:          50,
+		EnergyAutoconsuming: 10.5,
+		ThingFind:           "2024-06-04T08:55:36Z",
 	}
 
 	logger := zap.NewNop()
 	marshaler := &azzurroRealtimeDataMarshaler{logger: logger}
 
-	metrics, err := marshaler.UnmarshalMetrics(response)
+	metrics, err := marshaler.UnmarshalMetrics("test-device", testMetrics)
 	require.NoError(t, err)
 
 	resourceMetrics := metrics.ResourceMetrics().At(0)
 	scopeMetrics := resourceMetrics.ScopeMetrics().At(0)
-	
+
 	// Check that all metrics have the correct timestamp
 	expectedTimestamp := pcommon.Timestamp(testTime.UnixNano())
+	expectedDailyStartTimestamp := pcommon.Timestamp(testTime.Truncate(24 * time.Hour).UnixNano())
 	
+	// Parse thingFind for total metrics start timestamp
+	thingFindTime, err := time.Parse("2006-01-02T15:04:05Z", "2024-06-04T08:55:36Z")
+	require.NoError(t, err)
+	expectedThingFindTimestamp := pcommon.Timestamp(thingFindTime.UnixNano())
+
 	for i := 0; i < scopeMetrics.Metrics().Len(); i++ {
 		metric := scopeMetrics.Metrics().At(i)
-		
+
 		switch metric.Type() {
 		case pmetric.MetricTypeGauge:
 			dp := metric.Gauge().DataPoints().At(0)
@@ -238,9 +223,15 @@ func TestAzzurroRealtimeDataMarshaler_Timestamp(t *testing.T) {
 		case pmetric.MetricTypeSum:
 			dp := metric.Sum().DataPoints().At(0)
 			assert.Equal(t, expectedTimestamp, dp.Timestamp(), "Sum metric %s should have correct timestamp", metric.Name())
-			// Start timestamp should be set to start of day
-			expectedStartTimestamp := pcommon.Timestamp(testTime.Truncate(24 * time.Hour).UnixNano())
-			assert.Equal(t, expectedStartTimestamp, dp.StartTimestamp(), "Sum metric %s should have correct start timestamp", metric.Name())
+			
+			// Different start timestamps based on metric type
+			if strings.HasSuffix(metric.Name(), "_total") {
+				// Total metrics use thingFind timestamp as start
+				assert.Equal(t, expectedThingFindTimestamp, dp.StartTimestamp(), "Sum metric %s should have thingFind start timestamp", metric.Name())
+			} else {
+				// Daily metrics use start of day as start timestamp
+				assert.Equal(t, expectedDailyStartTimestamp, dp.StartTimestamp(), "Sum metric %s should have daily start timestamp", metric.Name())
+			}
 		}
 	}
 }
