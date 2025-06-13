@@ -9,10 +9,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zmoog/zcs/azzurro"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.uber.org/zap"
+
+	"github.com/zmoog/zcs/azzurro"
 )
 
 func TestAzzurroRealtimeDataMarshaler_UnmarshalMetrics(t *testing.T) {
@@ -34,7 +35,7 @@ func TestAzzurroRealtimeDataMarshaler_UnmarshalMetrics(t *testing.T) {
 		// Extract the first device from the response
 		deviceKey := "my-serial-number"
 		deviceMetrics := response.RealtimeData.Params.Value[0][deviceKey]
-		
+
 		metrics, err := marshaler.UnmarshalMetrics(deviceKey, deviceMetrics)
 		require.NoError(t, err)
 
@@ -119,7 +120,7 @@ func TestAzzurroRealtimeDataMarshaler_UnmarshalMetrics(t *testing.T) {
 	t.Run("empty response", func(t *testing.T) {
 		// Create empty metrics
 		emptyMetrics := azzurro.InverterMetrics{}
-		
+
 		metrics, err := marshaler.UnmarshalMetrics("test-device", emptyMetrics)
 		require.NoError(t, err)
 		// Should still create metrics even with empty data
@@ -144,7 +145,7 @@ func TestAzzurroRealtimeDataMarshaler_MetricValues(t *testing.T) {
 	// Extract the first device from the response
 	deviceKey := "my-serial-number"
 	deviceMetrics := response.RealtimeData.Params.Value[0][deviceKey]
-	
+
 	metrics, err := marshaler.UnmarshalMetrics(deviceKey, deviceMetrics)
 	require.NoError(t, err)
 
@@ -207,7 +208,7 @@ func TestAzzurroRealtimeDataMarshaler_Timestamp(t *testing.T) {
 	// Check that all metrics have the correct timestamp
 	expectedTimestamp := pcommon.Timestamp(testTime.UnixNano())
 	expectedDailyStartTimestamp := pcommon.Timestamp(testTime.Truncate(24 * time.Hour).UnixNano())
-	
+
 	// Parse thingFind for total metrics start timestamp
 	thingFindTime, err := time.Parse("2006-01-02T15:04:05Z", "2024-06-04T08:55:36Z")
 	require.NoError(t, err)
@@ -223,7 +224,7 @@ func TestAzzurroRealtimeDataMarshaler_Timestamp(t *testing.T) {
 		case pmetric.MetricTypeSum:
 			dp := metric.Sum().DataPoints().At(0)
 			assert.Equal(t, expectedTimestamp, dp.Timestamp(), "Sum metric %s should have correct timestamp", metric.Name())
-			
+
 			// Different start timestamps based on metric type
 			if strings.HasSuffix(metric.Name(), "_total") {
 				// Total metrics use thingFind timestamp as start
