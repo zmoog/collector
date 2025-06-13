@@ -25,16 +25,28 @@ type zcsazzurroReceiver struct {
 // - We haven't seen this thing before, OR
 // - The metrics timestamp is newer than what we last processed
 func (z *zcsazzurroReceiver) shouldProcessThing(thingKey string, metricsTime time.Time) bool {
+	z.logger.Debug("Checking if should process thing",
+		zap.String("thingKey", thingKey),
+		zap.Time("metricsTime", metricsTime))
+
+	z.logger.Debug("Cache keys", zap.Any("keys", z.cache.Keys()))
 	lastUpdate, exists := z.cache.Get(thingKey)
 	if !exists {
+		z.logger.Debug("Thing not seen before, processing", zap.String("thingKey", thingKey))
 		return true
 	}
 
+	z.logger.Debug("Thing seen before, checking last update",
+		zap.String("thingKey", thingKey),
+		zap.Time("lastUpdate", lastUpdate))
 	return metricsTime.After(lastUpdate)
 }
 
 // updateThingState updates the tracking state for a thing
 func (z *zcsazzurroReceiver) updateThingState(thingKey string, metricsTime time.Time) {
+	z.logger.Debug("Updating thing state",
+		zap.String("thingKey", thingKey),
+		zap.Time("metricsTime", metricsTime))
 	z.cache.Add(thingKey, metricsTime)
 }
 
@@ -85,8 +97,9 @@ func (z *zcsazzurroReceiver) Start(ctx context.Context, host component.Host) err
 
 						// Only update state after successful processing
 						z.updateThingState(thingKey, metrics.LastUpdate)
+						z.logger.Debug("Cache keys", zap.Any("keys", z.cache.Keys()))
 
-						z.logger.Debug("Successfully processed metrics",
+						z.logger.Info("Successfully processed metrics",
 							zap.String("thingKey", thingKey),
 							zap.Time("lastUpdate", metrics.LastUpdate))
 					}
