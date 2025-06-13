@@ -2,7 +2,6 @@ package zcsazzurroreceiver
 
 import (
 	"context"
-	"hash/maphash"
 	"time"
 
 	"github.com/elastic/go-freelru"
@@ -25,11 +24,13 @@ func createDefaultConfig() component.Config {
 	}
 }
 
-// hashString provides a hash function for string keys
+// hashString from https://github.com/elastic/go-freelru/blob/237b2bf67a116266a3660add83b1809373dc0ac7/shardedlru_test.go#L96C1-L103C2
 func hashString(s string) uint32 {
-	h := maphash.Hash{}
-	h.WriteString(s)
-	return uint32(h.Sum64())
+	var h uint32
+	for i := 0; i < len(s); i++ {
+		h = h*31 + uint32(s[i])
+	}
+	return h
 }
 
 func createMetricsReceiver(ctx context.Context, settings receiver.Settings, baseCfg component.Config, consumer consumer.Metrics) (receiver.Metrics, error) {
