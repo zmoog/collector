@@ -113,6 +113,7 @@ func (m *azzurroRealtimeDataMarshaler) UnmarshalMetrics(thingKey string, metrics
 		m.logger.Warn("Failed to parse thingFind timestamp, using daily start", zap.String("thingFind", metrics.ThingFind), zap.Error(err))
 		thingFindTime = metrics.LastUpdate.Truncate(24 * time.Hour)
 	}
+
 	// I assume thingFind is the discovery timestamp, when the thing was
 	// first installed. This is the start of the total cumulative metrics.
 	thingDiscoveryTimestamp := pcommon.Timestamp(thingFindTime.UnixNano())
@@ -136,6 +137,7 @@ func (m *azzurroRealtimeDataMarshaler) UnmarshalMetrics(thingKey string, metrics
 	// ----------------------------------------------------------------
 	// Energy metrics
 	// ----------------------------------------------------------------
+
 	// Gauge metrics for current energy values
 	m.addSumFloatMetric(scopeMetrics, "energy_autoconsuming", "Energy autoconsuming", "kWh", metrics.EnergyAutoconsuming, timestamp, startOfTodayTimestamp)
 	m.addSumFloatMetric(scopeMetrics, "energy_charging", "Energy charging", "kWh", metrics.EnergyCharging, timestamp, startOfTodayTimestamp)
@@ -145,13 +147,14 @@ func (m *azzurroRealtimeDataMarshaler) UnmarshalMetrics(thingKey string, metrics
 	m.addSumFloatMetric(scopeMetrics, "energy_generating", "Energy generating", "kWh", metrics.EnergyGenerating, timestamp, startOfTodayTimestamp)
 	m.addSumFloatMetric(scopeMetrics, "energy_importing", "Energy importing", "kWh", metrics.EnergyImporting, timestamp, startOfTodayTimestamp)
 
-	// Sum metrics for total energy values (cumulative) - lifetime totals since thingFind
-	m.addSumFloatMetric(scopeMetrics, "energy_autoconsuming_total", "Energy autoconsuming total", "kWh", metrics.EnergyAutoconsumingTotal, timestamp, thingDiscoveryTimestamp)
-	m.addSumFloatMetric(scopeMetrics, "energy_charging_total", "Energy charging total", "kWh", metrics.EnergyChargingTotal, timestamp, thingDiscoveryTimestamp)
-	m.addSumFloatMetric(scopeMetrics, "energy_consuming_total", "Energy consuming total", "kWh", metrics.EnergyConsumingTotal, timestamp, thingDiscoveryTimestamp)
-	m.addSumFloatMetric(scopeMetrics, "energy_discharging_total", "Energy discharging total", "kWh", metrics.EnergyDischargingTotal, timestamp, thingDiscoveryTimestamp)
-	m.addSumFloatMetric(scopeMetrics, "energy_exporting_total", "Energy exporting total", "kWh", metrics.EnergyExportingTotal, timestamp, thingDiscoveryTimestamp)
-	m.addSumFloatMetric(scopeMetrics, "energy_generating_total", "Energy generating total", "kWh", metrics.EnergyGeneratingTotal, timestamp, thingDiscoveryTimestamp)
-	m.addSumFloatMetric(scopeMetrics, "energy_importing_total", "Energy importing total", "kWh", metrics.EnergyImportingTotal, timestamp, thingDiscoveryTimestamp)
+	// // Sum metrics for total energy values (cumulative) - lifetime totals since thingFind
+	// m.addSumFloatMetric(scopeMetrics, "energy_autoconsuming_total", "Energy autoconsuming total", "kWh", metrics.EnergyAutoconsumingTotal, timestamp, thingDiscoveryTimestamp)
+	// m.addSumFloatMetric(scopeMetrics, "energy_charging_total", "Energy charging total", "kWh", metrics.EnergyChargingTotal, timestamp, thingDiscoveryTimestamp)
+	// m.addSumFloatMetric(scopeMetrics, "energy_consuming_total", "Energy consuming total", "kWh", metrics.EnergyConsumingTotal, timestamp, thingDiscoveryTimestamp)
+	// m.addSumFloatMetric(scopeMetrics, "energy_discharging_total", "Energy discharging total", "kWh", metrics.EnergyDischargingTotal, timestamp, thingDiscoveryTimestamp)
+	// m.addSumFloatMetric(scopeMetrics, "energy_exporting_total", "Energy exporting total", "kWh", metrics.EnergyExportingTotal, timestamp, thingDiscoveryTimestamp)
+	// m.addSumFloatMetric(scopeMetrics, "energy_generating_total", "Energy generating total", "kWh", metrics.EnergyGeneratingTotal, timestamp, thingDiscoveryTimestamp)
+	// m.addSumFloatMetric(scopeMetrics, "energy_importing_total", "Energy importing total", "kWh", metrics.EnergyImportingTotal, timestamp, thingDiscoveryTimestamp)
+
 	return md, nil
 }
