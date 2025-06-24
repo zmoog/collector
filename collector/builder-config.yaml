@@ -27,6 +27,8 @@ receivers:
 extensions:
   - gomod:
       github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension v0.128.0
+  - gomod:
+      github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.128.0
 
 replaces:
   - github.com/zmoog/collector/receiver/toggltrackreceiver v0.128.0 => ../receiver/toggltrackreceiver

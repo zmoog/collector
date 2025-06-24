@@ -13,6 +13,7 @@ import (
 	debugexporter "go.opentelemetry.io/collector/exporter/debugexporter"
 	elasticsearchexporter "github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	basicauthextension "github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension"
+	healthcheckextension "github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	batchprocessor "go.opentelemetry.io/collector/processor/batchprocessor"
 	toggltrackreceiver "github.com/zmoog/collector/receiver/toggltrackreceiver"
 	zcsazzurroreceiver "github.com/zmoog/collector/receiver/zcsazzurroreceiver"
@@ -25,12 +26,14 @@ func components() (otelcol.Factories, error) {
 
 	factories.Extensions, err = otelcol.MakeFactoryMap[extension.Factory](
 		basicauthextension.NewFactory(),
+		healthcheckextension.NewFactory(),
 	)
 	if err != nil {
 		return otelcol.Factories{}, err
 	}
 	factories.ExtensionModules = make(map[component.Type]string, len(factories.Extensions))
 	factories.ExtensionModules[basicauthextension.NewFactory().Type()] = "github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension v0.128.0"
+	factories.ExtensionModules[healthcheckextension.NewFactory().Type()] = "github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.128.0"
 
 	factories.Receivers, err = otelcol.MakeFactoryMap[receiver.Factory](
 		toggltrackreceiver.NewFactory(),

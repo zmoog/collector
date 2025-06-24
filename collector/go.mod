@@ -9,6 +9,7 @@ toolchain go1.24.4
 require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.128.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension v0.128.0
+	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.128.0
 	github.com/zmoog/collector/receiver/toggltrackreceiver v0.128.0
 	github.com/zmoog/collector/receiver/wavinsentioreceiver v0.128.0
 	github.com/zmoog/collector/receiver/zcsazzurroreceiver v0.128.0
@@ -99,8 +100,8 @@ require (
 	github.com/tklauser/numcpus v0.8.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	github.com/zmoog/ws v0.1.0 // indirect
-	github.com/zmoog/zcs v0.2.0 // indirect
+	github.com/zmoog/ws v0.1.1 // indirect
+	github.com/zmoog/zcs v0.3.0 // indirect
 	go.elastic.co/apm/module/apmzap/v2 v2.7.0 // indirect
 	go.elastic.co/apm/v2 v2.7.0 // indirect
 	go.elastic.co/fastjson v1.5.0 // indirect
