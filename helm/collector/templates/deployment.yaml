@@ -21,7 +21,6 @@ spec:
       labels:
         app.kubernetes.io/name: {{.Release.Name}}
         app.kubernetes.io/component: otel-collector
-        app.kubernetes.io/part-of: hosted-otel-collector
         app.kubernetes.io/version: {{ .Chart.AppVersion }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
     spec:
