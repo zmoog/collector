@@ -24,8 +24,6 @@ spec:
         app.kubernetes.io/version: {{ .Chart.AppVersion }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
     spec:
-      # nodeSelector:
-      #   infra.k8s.elastic.co/hardware-profile: {{.Values.labels.hardware_profile}}
       securityContext:
         runAsNonRoot: true
       containers:
@@ -56,8 +54,6 @@ spec:
           capabilities:
             drop:
               - "ALL"
-      imagePullSecrets:
-      - name: elastic-docker-registry
       volumes:
       - name: collector-config
         configMap:
