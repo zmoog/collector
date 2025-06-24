@@ -1,0 +1,39 @@
+image:
+  registry: ghcr.io/zmoog/collector
+  tag: latest@sha256:4bd9c370e698f6dc5a44dd9a6f9a3d7f52ed207bc060c54aa774e39cb99992e7
+
+labels:
+  hardware_profile: general-purpose
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+elasticsearch:
+  endpoints: ""
+  username: ""
+  password: ""
+
+wavinsentio:
+  interval: "1m"
+  username: ""
+  password: ""
+
+zcsazzurro:
+  interval: "5m"
+  client_id: ""
+  auth_key: ""
+  thing_key: ""
+
+toggl:
+  interval: "5m"
+  api_token: ""
+  lookback: "720h"
+
+telemetry:
+  log:
+    level: debug
