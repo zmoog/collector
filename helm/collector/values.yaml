@@ -5,9 +5,6 @@ image:
 labels:
   hardware_profile: general-purpose
 
-deployment:
-  type: ClusterIP
-
 resources:
   requests:
     memory: "128Mi"
