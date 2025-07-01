@@ -14,8 +14,8 @@ require (
 	github.com/zmoog/collector/receiver/wavinsentioreceiver v0.128.0
 	github.com/zmoog/collector/receiver/zcsazzurroreceiver v0.128.0
 	go.opentelemetry.io/collector/component v1.34.0
-	go.opentelemetry.io/collector/confmap v1.34.0
-	go.opentelemetry.io/collector/confmap/provider/envprovider v1.34.0
+	go.opentelemetry.io/collector/confmap v1.35.0
+	go.opentelemetry.io/collector/confmap/provider/envprovider v1.35.0
 	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.34.0
 	go.opentelemetry.io/collector/confmap/provider/httpprovider v1.34.0
 	go.opentelemetry.io/collector/confmap/provider/httpsprovider v1.34.0
@@ -55,7 +55,7 @@ require (
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
-	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
+	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
@@ -70,7 +70,7 @@ require (
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/knadh/koanf/providers/confmap v1.0.0 // indirect
-	github.com/knadh/koanf/v2 v2.2.0 // indirect
+	github.com/knadh/koanf/v2 v2.2.1 // indirect
 	github.com/lestrrat-go/strftime v1.1.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/minio/sha256-simd v1.0.1 // indirect
@@ -133,7 +133,7 @@ require (
 	go.opentelemetry.io/collector/extension/extensionmiddleware v0.128.0 // indirect
 	go.opentelemetry.io/collector/extension/extensiontest v0.128.0 // indirect
 	go.opentelemetry.io/collector/extension/xextension v0.128.0 // indirect
-	go.opentelemetry.io/collector/featuregate v1.34.0 // indirect
+	go.opentelemetry.io/collector/featuregate v1.35.0 // indirect
 	go.opentelemetry.io/collector/internal/fanoutconsumer v0.128.0 // indirect
 	go.opentelemetry.io/collector/internal/telemetry v0.128.0 // indirect
 	go.opentelemetry.io/collector/pdata v1.34.0 // indirect
