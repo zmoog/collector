@@ -42,8 +42,8 @@ fmt:
 	go tool goimports -local github.com/zmoog/ -w .
 
 .PHONY: collector-source
-collector-source:
-	cd collector && go run go.opentelemetry.io/collector/cmd/builder@v0.128.0 --config ./builder-config.yaml
+collector-source: generate
+	cd collector && go run go.opentelemetry.io/collector/cmd/builder@v0.129.0 --config ./builder-config.yaml
 
 .PHONY: run
 run:
