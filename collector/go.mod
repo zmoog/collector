@@ -4,7 +4,7 @@ module github.com/zmoog/collector/collector
 
 go 1.24.0
 
-toolchain go1.24.4
+toolchain go1.24.5
 
 require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.129.0
