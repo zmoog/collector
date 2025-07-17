@@ -37,13 +37,16 @@ staticcheck:
 	# file present
 	find . -name go.mod -execdir go tool staticcheck ./... \;
 
+.PHONY: check
+check: generate staticcheck fmt
+
 .PHONY: fmt
 fmt:
 	go tool goimports -local github.com/zmoog/ -w .
 
 .PHONY: collector-source
 collector-source: generate
-	cd collector && go run go.opentelemetry.io/collector/cmd/builder@v0.129.0 --config ./builder-config.yaml
+	cd collector && go run go.opentelemetry.io/collector/cmd/builder@v0.130.0 --config ./builder-config.yaml
 
 .PHONY: run
 run:

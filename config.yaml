@@ -30,9 +30,13 @@ exporters:
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/elasticsearchexporter
   elasticsearch:
     endpoints: ${env:ELASTICSEARCH_ENDPOINTS}
-    logs_index: logs-toggl.track-default
     auth:
       authenticator: basicauth
+
+  otlp/elastic:
+    endpoint: ${env:ELASTICSEARCH_ENDPOINTS}
+    headers:
+      Authorization: "ApiKey ${env:ELASTICSEARCH_API_KEY}"
 
 extensions:
   basicauth:
@@ -45,15 +49,13 @@ service:
   pipelines:
     logs:
       receivers: [toggltrack]
-      exporters: [elasticsearch]
+      exporters: [otlp/elastic]
     metrics:
-      receivers: [wavinsentio, zcsazzurro]
-      # receivers: [wavinsentio]
-      # exporters: [elasticsearch, debug]
-      exporters: [elasticsearch]
+      receivers: [zcsazzurro]
+      exporters: [otlp/elastic]
   telemetry:
     resource:
       service.name: "collector"
     logs:
-      level: debug
-      encoding: json
+      level: info
+      # encoding: json
