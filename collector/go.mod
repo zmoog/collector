@@ -13,7 +13,7 @@ require (
 	github.com/zmoog/collector/receiver/toggltrackreceiver v0.130.0
 	github.com/zmoog/collector/receiver/wavinsentioreceiver v0.130.0
 	github.com/zmoog/collector/receiver/zcsazzurroreceiver v0.130.0
-	go.opentelemetry.io/collector/component v1.36.0
+	go.opentelemetry.io/collector/component v1.36.1
 	go.opentelemetry.io/collector/confmap v1.36.0
 	go.opentelemetry.io/collector/confmap/provider/envprovider v1.36.0
 	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.36.0
@@ -132,14 +132,14 @@ require (
 	go.opentelemetry.io/collector/extension/extensionmiddleware v0.130.0 // indirect
 	go.opentelemetry.io/collector/extension/extensiontest v0.130.0 // indirect
 	go.opentelemetry.io/collector/extension/xextension v0.130.0 // indirect
-	go.opentelemetry.io/collector/featuregate v1.36.0 // indirect
+	go.opentelemetry.io/collector/featuregate v1.36.1 // indirect
 	go.opentelemetry.io/collector/internal/fanoutconsumer v0.130.0 // indirect
-	go.opentelemetry.io/collector/internal/telemetry v0.130.0 // indirect
-	go.opentelemetry.io/collector/pdata v1.36.0 // indirect
+	go.opentelemetry.io/collector/internal/telemetry v0.130.1 // indirect
+	go.opentelemetry.io/collector/pdata v1.36.1 // indirect
 	go.opentelemetry.io/collector/pdata/pprofile v0.130.0 // indirect
 	go.opentelemetry.io/collector/pdata/testdata v0.130.0 // indirect
 	go.opentelemetry.io/collector/pdata/xpdata v0.130.0 // indirect
-	go.opentelemetry.io/collector/pipeline v0.130.0 // indirect
+	go.opentelemetry.io/collector/pipeline v0.130.1 // indirect
 	go.opentelemetry.io/collector/pipeline/xpipeline v0.130.0 // indirect
 	go.opentelemetry.io/collector/processor/processortest v0.130.0 // indirect
 	go.opentelemetry.io/collector/processor/xprocessor v0.130.0 // indirect
