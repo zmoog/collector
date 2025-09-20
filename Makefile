@@ -46,7 +46,7 @@ fmt:
 
 .PHONY: collector-source
 collector-source: generate
-	cd collector && go run go.opentelemetry.io/collector/cmd/builder@v0.130.0 --config ./builder-config.yaml
+	cd collector && go tool builder --config ./builder-config.yaml
 
 .PHONY: run
 run:
