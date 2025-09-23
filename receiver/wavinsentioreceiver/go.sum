@@ -59,6 +59,7 @@ github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9de
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/zmoog/ws v0.1.1 h1:7vgnpIO2weQ9PnbB1UtujdJbxJw5oBJVCzqzPlJho8c=
 github.com/zmoog/ws v0.1.1/go.mod h1:kF1WuLBzM8TpqPY9IGCZNFHhv2NylHCxFF5keeZcAhY=
+github.com/zmoog/ws/v2 v2.0.0/go.mod h1:Jl8cLao3qZL+tDGXDDVQIzRl3gbcUIHM6hCMvOzA7aA=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
 go.opentelemetry.io/auto/sdk v1.1.0/go.mod h1:3wSPjt5PWp2RhlCcmmOial7AvC4DQqZb7a7wCow3W8A=
 go.opentelemetry.io/collector/component v1.42.0 h1:on4XJ/NT1oPnuCVKDEtlpcr3GGPAS9taWBe8woHSTmY=
