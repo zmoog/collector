@@ -4,7 +4,6 @@ go 1.25.1
 
 require (
 	github.com/stretchr/testify v1.11.1
-	github.com/zmoog/ws v0.1.1
 	github.com/zmoog/ws/v2 v2.0.0
 	go.opentelemetry.io/collector/component v1.42.0
 	go.opentelemetry.io/collector/component/componenttest v0.136.0
