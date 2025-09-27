@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	scopeName   = "github.com/zmoog/collector/receiver/toggltrackreceiver"
-	scopeVerion = "v0.1.0"
+	scopeName    = "github.com/zmoog/collector/receiver/toggltrackreceiver"
+	scopeVersion = "v0.1.0"
 )
 
 type timeEntryMarshaler struct{}
@@ -23,7 +23,7 @@ func (m *timeEntryMarshaler) UnmarshalLogs(timeEntries []toggl.TimeEntry) (plog.
 
 	scopeLogs := resourceLogs.ScopeLogs().AppendEmpty()
 	scopeLogs.Scope().SetName(scopeName)
-	scopeLogs.Scope().SetVersion(scopeVerion)
+	scopeLogs.Scope().SetVersion(scopeVersion)
 	logRecords := scopeLogs.LogRecords()
 
 	for _, e := range timeEntries {
