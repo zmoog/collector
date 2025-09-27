@@ -31,7 +31,6 @@ func createDefaultConfig() component.Config {
 }
 
 func createMetricsReceiver(ctx context.Context, settings receiver.Settings, baseCfg component.Config, consumer consumer.Metrics) (receiver.Metrics, error) {
-	// logger := settings.Logger
 	cfg, ok := baseCfg.(*Config)
 	if !ok {
 		return nil, fmt.Errorf("invalid config type")
@@ -55,17 +54,6 @@ func createMetricsReceiver(ctx context.Context, settings receiver.Settings, base
 		consumer,
 		scraperhelper.AddScraper(metadata.Type, metrics),
 	)
-
-	// rcvr := wavinsentioReceiver{
-	// 	logger:              logger,
-	// 	consumer:            consumer,
-	// 	config:              &config,
-	// 	scraper:             scraper,
-	// 	locationUnmarshaler: &locationUnmarshaler{logger: logger},
-	// 	roomUnmarshaler:     &roomUnmarshaler{logger: logger},
-	// }
-
-	// return &rcvr, nil
 }
 
 func NewFactory() receiver.Factory {
