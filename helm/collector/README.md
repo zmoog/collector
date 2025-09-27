@@ -2,7 +2,7 @@
 
 ```sh
 # deploy using the Elasticsearch exporter
-helm template collector helm/collector \        
+helm template collector helm/collector \
   --set elasticsearch.endpoints="${ELASTICSEARCH_ENDPOINTS}" \
   --set elasticsearch.username="${ELASTICSEARCH_USERNAME}" \
   --set elasticsearch.password="${ELASTICSEARCH_PASSWORD}" \
