@@ -1,6 +1,6 @@
 image:
   registry: ghcr.io/zmoog/collector
-  tag: latest@sha256:4bd9c370e698f6dc5a44dd9a6f9a3d7f52ed207bc060c54aa774e39cb99992e7
+  tag: latest@sha256:a07c861961e2e5a97c154757fda22b901850e5f4a66734d4d6b0c511225f4edb
 
 labels:
   hardware_profile: general-purpose
@@ -17,11 +17,17 @@ elasticsearch:
   endpoints: ""
   username: ""
   password: ""
+  api_key: ""
 
 wavinsentio:
-  interval: "1m"
+  collection_interval: "1m"
+  # Production endpoint.
+  endpoint: "https://blaze.wavinsentio.com/wavin.blaze.v1.BlazeDeviceService"
   username: ""
   password: ""
+  # This is not a secret, it is the app in Firebase that is used
+  # to authenticate with the Wavin Sentio API.
+  web_api_key: "AIzaSyBlAtNI7-2jitPul9I-O4EZcT-n0sIay-g"
 
 zcsazzurro:
   interval: "5m"

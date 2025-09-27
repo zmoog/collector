@@ -38,7 +38,7 @@ func (s *wavinsentioScraper) scrape(_ context.Context) (pmetric.Metrics, error) 
 }
 
 func (s *wavinsentioScraper) start(_ context.Context, host component.Host) (err error) {
-	identityManager := identity.NewManager(
+	identityManager := identity.NewInMemoryManager(
 		s.cfg.Username,
 		s.cfg.Password,
 		s.cfg.WebApiKey,
