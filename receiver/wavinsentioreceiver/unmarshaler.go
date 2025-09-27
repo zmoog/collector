@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	scopeName   = "github.com/zmoog/collector/receiver/wavinsentioreceiver"
-	scopeVerion = "v0.2.0"
+	scopeName    = "github.com/zmoog/collector/receiver/wavinsentioreceiver"
+	scopeVersion = "v0.2.0"
 )
 
 type devicesUnmarshaler struct {
@@ -38,7 +38,7 @@ func (u *devicesUnmarshaler) UnmarshalMetrics(devices []ws2.Device) (pmetric.Met
 
 		scopeMetrics := resourceMetrics.ScopeMetrics().AppendEmpty()
 		scopeMetrics.Scope().SetName(scopeName)
-		scopeMetrics.Scope().SetVersion(scopeVerion)
+		scopeMetrics.Scope().SetVersion(scopeVersion)
 
 		metrics := scopeMetrics.Metrics()
 
@@ -77,7 +77,7 @@ func (u *devicesUnmarshaler) UnmarshalMetrics(devices []ws2.Device) (pmetric.Met
 
 			roomScopeMetrics := roomResourceMetrics.ScopeMetrics().AppendEmpty()
 			roomScopeMetrics.Scope().SetName(scopeName)
-			roomScopeMetrics.Scope().SetVersion(scopeVerion)
+			roomScopeMetrics.Scope().SetVersion(scopeVersion)
 
 			roomMetrics := roomScopeMetrics.Metrics()
 
