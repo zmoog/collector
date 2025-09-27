@@ -20,14 +20,9 @@ type Config struct {
 }
 
 func (cfg Config) Validate() error {
-	interval, err := time.ParseDuration(cfg.CollectionInterval.String())
-	if err != nil {
-		return fmt.Errorf("invalid interval: %w", err)
-	}
-	if interval < MinCollectionInterval {
+	if cfg.CollectionInterval < MinCollectionInterval {
 		return fmt.Errorf("interval must be at least %s", MinCollectionInterval)
 	}
-
 	if cfg.Endpoint == "" {
 		return fmt.Errorf("endpoint is required")
 	}
