@@ -15,10 +15,11 @@ data:
         lookback: {{ .Values.toggl.lookback }}
         api_token: {{ .Values.toggl.api_token }}
       wavinsentio:
-        interval: {{ .Values.wavinsentio.interval }}
-        # interval: ${env:WS_INTERVAL:-30s}
+        collection_interval: {{ .Values.wavinsentio.collection_interval }}
+        endpoint: {{ .Values.wavinsentio.endpoint }}
         username: {{ .Values.wavinsentio.username }}
         password: {{ .Values.wavinsentio.password }}
+        web_api_key: {{ .Values.wavinsentio.web_api_key }}
       zcsazzurro:
         interval: {{ .Values.zcsazzurro.interval }}
         client_id: {{ .Values.zcsazzurro.client_id }}
