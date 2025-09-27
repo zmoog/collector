@@ -10,10 +10,11 @@ receivers:
     lookback: ${env:TOGGL_LOOKBACK:-720h} # 24h * 30 = 30 days
     api_token: ${env:TOGGL_API_TOKEN}
   wavinsentio:
-    interval: ${env:WS_INTERVAL:-1m}
-    # interval: ${env:WS_INTERVAL:-30s}
+    collection_interval: ${env:WS_INTERVAL:-60s}
+    endpoint: ${env:WS_ENDPOINT:-https://blaze.wavinsentio.com/wavin.blaze.v1.BlazeDeviceService}
     username: ${env:WS_USERNAME}
     password: ${env:WS_PASSWORD}
+    web_api_key: ${env:WS_WEB_API_KEY:-AIzaSyBlAtNI7-2jitPul9I-O4EZcT-n0sIay-g}
   zcsazzurro:
     interval: ${env:ZCS_INTERVAL:-5m}
     client_id: ${env:ZCS_CLIENT_ID}
@@ -47,11 +48,11 @@ extensions:
 service:
   extensions: [basicauth]
   pipelines:
-    logs:
-      receivers: [toggltrack]
-      exporters: [otlp/elastic]
+    # logs:
+    #   receivers: [toggltrack]
+    #   exporters: [otlp/elastic]
     metrics:
-      receivers: [zcsazzurro]
+      receivers: [wavinsentio]
       exporters: [otlp/elastic]
   telemetry:
     resource:

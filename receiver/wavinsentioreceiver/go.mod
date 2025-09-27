@@ -5,6 +5,7 @@ go 1.25.1
 require (
 	github.com/stretchr/testify v1.11.1
 	github.com/zmoog/ws v0.1.1
+	github.com/zmoog/ws/v2 v2.0.0
 	go.opentelemetry.io/collector/component v1.42.0
 	go.opentelemetry.io/collector/component/componenttest v0.136.0
 	go.opentelemetry.io/collector/confmap v1.42.0
@@ -13,6 +14,8 @@ require (
 	go.opentelemetry.io/collector/pdata v1.42.0
 	go.opentelemetry.io/collector/receiver v1.42.0
 	go.opentelemetry.io/collector/receiver/receivertest v0.136.0
+	go.opentelemetry.io/collector/scraper v0.136.0
+	go.opentelemetry.io/collector/scraper/scraperhelper v0.136.0
 	go.uber.org/goleak v1.3.0
 	go.uber.org/zap v1.27.0
 )
@@ -42,6 +45,7 @@ require (
 	go.opentelemetry.io/collector/internal/telemetry v0.136.0 // indirect
 	go.opentelemetry.io/collector/pdata/pprofile v0.136.0 // indirect
 	go.opentelemetry.io/collector/pipeline v1.42.0 // indirect
+	go.opentelemetry.io/collector/receiver/receiverhelper v0.136.0 // indirect
 	go.opentelemetry.io/collector/receiver/xreceiver v0.136.0 // indirect
 	go.opentelemetry.io/contrib/bridges/otelzap v0.12.0 // indirect
 	go.opentelemetry.io/otel v1.38.0 // indirect
