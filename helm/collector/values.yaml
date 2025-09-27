@@ -25,7 +25,7 @@ wavinsentio:
   endpoint: "https://blaze.wavinsentio.com/wavin.blaze.v1.BlazeDeviceService"
   username: ""
   password: ""
-  # This is not a secret, it the app in Firebase that is used
+  # This is not a secret, it is the app in Firebase that is used
   # to authenticate with the Wavin Sentio API.
   web_api_key: "AIzaSyBlAtNI7-2jitPul9I-O4EZcT-n0sIay-g"
 
