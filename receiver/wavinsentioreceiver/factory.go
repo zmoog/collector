@@ -36,8 +36,6 @@ func createMetricsReceiver(ctx context.Context, settings receiver.Settings, base
 		return nil, fmt.Errorf("invalid config type")
 	}
 
-	var metrics scraper.Metrics
-
 	wavinsentioScraper := newScraper(cfg, settings)
 
 	metrics, err := scraper.NewMetrics(
