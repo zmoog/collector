@@ -3,26 +3,23 @@ package zcsazzurroreceiver
 import (
 	"fmt"
 	"time"
+
+	"go.opentelemetry.io/collector/scraper/scraperhelper"
 )
 
 const (
-	minInterval = 30 * time.Second
+	MinCollectionInterval = 30 * time.Second
 )
 
 type Config struct {
-	Interval string `mapstructure:"interval"`
-	ClientID string `mapstructure:"client_id"`
-	AuthKey  string `mapstructure:"auth_key"`
-	ThingKey string `mapstructure:"thing_key"`
+	scraperhelper.ControllerConfig `mapstructure:",squash"`
+	ClientID                       string `mapstructure:"client_id"`
+	AuthKey                        string `mapstructure:"auth_key"`
+	ThingKey                       string `mapstructure:"thing_key"`
 }
 
 func (cfg *Config) Validate() error {
-	// Validate that min interval is `minInterval`
-	interval, err := time.ParseDuration(cfg.Interval)
-	if err != nil {
-		return fmt.Errorf("invalid interval: %w", err)
-	}
-	if interval < minInterval {
+	if cfg.CollectionInterval < MinCollectionInterval {
 		// ZCS updates data every 5 minutes, so it makes no sense
 		// to have a smaller interval.
 		//
@@ -35,7 +32,7 @@ func (cfg *Config) Validate() error {
 		//
 		// So, having a smaller interval than the update
 		// interval is not a problem.
-		return fmt.Errorf("interval must be at least %s", minInterval)
+		return fmt.Errorf("collection_interval must be at least %s", MinCollectionInterval)
 	}
 
 	if cfg.AuthKey == "" {
