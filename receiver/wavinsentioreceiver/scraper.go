@@ -11,6 +11,7 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 )
 
+// wavinsentioScraper is the struct that contains the Wavin Sentio scraper.
 type wavinsentioScraper struct {
 	cfg                *Config
 	settings           component.TelemetrySettings
@@ -18,6 +19,7 @@ type wavinsentioScraper struct {
 	devicesUnmarshaler *devicesUnmarshaler
 }
 
+// newScraper is the function that creates a new Wavin Sentio scraper.
 func newScraper(cfg *Config, settings receiver.Settings) *wavinsentioScraper {
 	return &wavinsentioScraper{
 		cfg:      cfg,
@@ -28,6 +30,7 @@ func newScraper(cfg *Config, settings receiver.Settings) *wavinsentioScraper {
 	}
 }
 
+// scrape is the main function that scrapes the data from the Wavin Sentio API.
 func (s *wavinsentioScraper) scrape(_ context.Context) (pmetric.Metrics, error) {
 	devices, err := s.client.ListDevices()
 	if err != nil {
@@ -37,11 +40,14 @@ func (s *wavinsentioScraper) scrape(_ context.Context) (pmetric.Metrics, error) 
 	return s.devicesUnmarshaler.UnmarshalMetrics(devices)
 }
 
+// start is the function that starts the Wavin Sentio scraper.
 func (s *wavinsentioScraper) start(_ context.Context, host component.Host) (err error) {
 	identityManager := identity.NewInMemoryManager(
-		s.cfg.Username,
-		s.cfg.Password,
-		s.cfg.WebApiKey,
+		identity.Config{
+			Username:  s.cfg.Username,
+			Password:  s.cfg.Password,
+			WebApiKey: s.cfg.WebApiKey,
+		},
 	)
 	s.client = ws.NewClient(identityManager, s.cfg.Endpoint)
 	return nil
