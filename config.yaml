@@ -16,7 +16,7 @@ receivers:
     password: ${env:WS_PASSWORD}
     web_api_key: ${env:WS_WEB_API_KEY:-AIzaSyBlAtNI7-2jitPul9I-O4EZcT-n0sIay-g}
   zcsazzurro:
-    interval: ${env:ZCS_INTERVAL:-5m}
+    collection_interval: ${env:WS_INTERVAL:-5m}
     client_id: ${env:ZCS_CLIENT_ID}
     auth_key: ${env:ZCS_AUTH_KEY}
     thing_key: ${env:ZCS_THING_KEY}
@@ -52,7 +52,7 @@ service:
     #   receivers: [toggltrack]
     #   exporters: [otlp/elastic]
     metrics:
-      receivers: [wavinsentio]
+      receivers: [zcsazzurro]
       exporters: [otlp/elastic]
   telemetry:
     resource:

@@ -2,12 +2,16 @@ package zcsazzurroreceiver
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/elastic/go-freelru"
+	"github.com/zmoog/collector/receiver/zcsazzurroreceiver/internal/metadata"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
+	"go.opentelemetry.io/collector/scraper"
+	"go.opentelemetry.io/collector/scraper/scraperhelper"
 )
 
 var (
@@ -15,12 +19,14 @@ var (
 )
 
 const (
-	defaultInterval = 5 * time.Minute
+	DefaultCollectionInterval = 5 * time.Minute
 )
 
 func createDefaultConfig() component.Config {
-	return Config{
-		Interval: defaultInterval.String(),
+	cfg := scraperhelper.NewDefaultControllerConfig()
+	cfg.CollectionInterval = DefaultCollectionInterval
+	return &Config{
+		ControllerConfig: cfg,
 	}
 }
 
@@ -34,9 +40,10 @@ func hashString(s string) uint32 {
 }
 
 func createMetricsReceiver(ctx context.Context, settings receiver.Settings, baseCfg component.Config, consumer consumer.Metrics) (receiver.Metrics, error) {
-	logger := settings.Logger
-	config := baseCfg.(Config)
-	scraper := NewScraper(config.ClientID, config.AuthKey, config.ThingKey, logger)
+	cfg, ok := baseCfg.(*Config)
+	if !ok {
+		return nil, fmt.Errorf("invalid config type")
+	}
 
 	// Initialize LRU cache with capacity for 1000 things
 	cache, err := freelru.NewSynced[string, time.Time](1000, hashString)
@@ -44,16 +51,22 @@ func createMetricsReceiver(ctx context.Context, settings receiver.Settings, base
 		return nil, err
 	}
 
-	rcvr := zcsazzurroReceiver{
-		logger:    logger,
-		consumer:  consumer,
-		config:    &config,
-		scraper:   scraper,
-		marshaler: newAzzurroRealtimeDataMarshaler(logger),
-		cache:     cache,
+	zcsazzurroScraper := newScraper(cfg, settings, cache)
+
+	metrics, err := scraper.NewMetrics(
+		zcsazzurroScraper.scrape,
+		scraper.WithStart(zcsazzurroScraper.start),
+	)
+	if err != nil {
+		return nil, err
 	}
 
-	return &rcvr, nil
+	return scraperhelper.NewMetricsController(
+		&cfg.ControllerConfig,
+		settings,
+		consumer,
+		scraperhelper.AddScraper(metadata.Type, metrics),
+	)
 }
 
 func NewFactory() receiver.Factory {

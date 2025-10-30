@@ -12,7 +12,7 @@ import (
 
 const (
 	scopeName    = "github.com/zmoog/collector/receiver/zcsazzurroreceiver"
-	scopeVersion = "v0.1.0"
+	scopeVersion = "v0.2.0"
 )
 
 type azzurroRealtimeDataMarshaler struct {
@@ -147,14 +147,14 @@ func (m *azzurroRealtimeDataMarshaler) UnmarshalMetrics(thingKey string, metrics
 	m.addSumFloatMetric(scopeMetrics, "energy_generating", "Energy generating", "kWh", metrics.EnergyGenerating, timestamp, startOfTodayTimestamp)
 	m.addSumFloatMetric(scopeMetrics, "energy_importing", "Energy importing", "kWh", metrics.EnergyImporting, timestamp, startOfTodayTimestamp)
 
-	// // Sum metrics for total energy values (cumulative) - lifetime totals since thingFind
-	// m.addSumFloatMetric(scopeMetrics, "energy_autoconsuming_total", "Energy autoconsuming total", "kWh", metrics.EnergyAutoconsumingTotal, timestamp, thingDiscoveryTimestamp)
-	// m.addSumFloatMetric(scopeMetrics, "energy_charging_total", "Energy charging total", "kWh", metrics.EnergyChargingTotal, timestamp, thingDiscoveryTimestamp)
-	// m.addSumFloatMetric(scopeMetrics, "energy_consuming_total", "Energy consuming total", "kWh", metrics.EnergyConsumingTotal, timestamp, thingDiscoveryTimestamp)
-	// m.addSumFloatMetric(scopeMetrics, "energy_discharging_total", "Energy discharging total", "kWh", metrics.EnergyDischargingTotal, timestamp, thingDiscoveryTimestamp)
-	// m.addSumFloatMetric(scopeMetrics, "energy_exporting_total", "Energy exporting total", "kWh", metrics.EnergyExportingTotal, timestamp, thingDiscoveryTimestamp)
-	// m.addSumFloatMetric(scopeMetrics, "energy_generating_total", "Energy generating total", "kWh", metrics.EnergyGeneratingTotal, timestamp, thingDiscoveryTimestamp)
-	// m.addSumFloatMetric(scopeMetrics, "energy_importing_total", "Energy importing total", "kWh", metrics.EnergyImportingTotal, timestamp, thingDiscoveryTimestamp)
+	// Sum metrics for total energy values (cumulative) - lifetime totals since thingFind
+	m.addSumFloatMetric(scopeMetrics, "energy_autoconsuming_total", "Energy autoconsuming total", "kWh", metrics.EnergyAutoconsumingTotal, timestamp, thingDiscoveryTimestamp)
+	m.addSumFloatMetric(scopeMetrics, "energy_charging_total", "Energy charging total", "kWh", metrics.EnergyChargingTotal, timestamp, thingDiscoveryTimestamp)
+	m.addSumFloatMetric(scopeMetrics, "energy_consuming_total", "Energy consuming total", "kWh", metrics.EnergyConsumingTotal, timestamp, thingDiscoveryTimestamp)
+	m.addSumFloatMetric(scopeMetrics, "energy_discharging_total", "Energy discharging total", "kWh", metrics.EnergyDischargingTotal, timestamp, thingDiscoveryTimestamp)
+	m.addSumFloatMetric(scopeMetrics, "energy_exporting_total", "Energy exporting total", "kWh", metrics.EnergyExportingTotal, timestamp, thingDiscoveryTimestamp)
+	m.addSumFloatMetric(scopeMetrics, "energy_generating_total", "Energy generating total", "kWh", metrics.EnergyGeneratingTotal, timestamp, thingDiscoveryTimestamp)
+	m.addSumFloatMetric(scopeMetrics, "energy_importing_total", "Energy importing total", "kWh", metrics.EnergyImportingTotal, timestamp, thingDiscoveryTimestamp)
 
 	return md, nil
 }
