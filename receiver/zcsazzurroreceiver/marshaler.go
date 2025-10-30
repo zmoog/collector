@@ -12,7 +12,7 @@ import (
 
 const (
 	scopeName    = "github.com/zmoog/collector/receiver/zcsazzurroreceiver"
-	scopeVersion = "v0.1.0"
+	scopeVersion = "v0.2.0"
 )
 
 type azzurroRealtimeDataMarshaler struct {
