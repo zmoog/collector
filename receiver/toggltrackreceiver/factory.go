@@ -2,11 +2,16 @@ package toggltrackreceiver
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
+	"go.opentelemetry.io/collector/scraper"
+	"go.opentelemetry.io/collector/scraper/scraperhelper"
+
+	"github.com/zmoog/collector/receiver/toggltrackreceiver/internal/metadata"
 )
 
 var (
@@ -14,30 +19,52 @@ var (
 )
 
 const (
-	defaultInterval = 1 * time.Minute
-	defaultLookback = 24 * 30 * time.Hour // 30 days
+	DefaultCollectionInterval = 1 * time.Minute
+	DefaultLookback           = 24 * 30 * time.Hour // 30 days
 )
 
 func createDefaultConfig() component.Config {
-	return Config{
-		Interval: defaultInterval.String(),
-		Lookback: defaultLookback.String(),
+	cfg := scraperhelper.NewDefaultControllerConfig()
+	cfg.CollectionInterval = DefaultCollectionInterval
+	return &Config{
+		ControllerConfig: cfg,
+		Lookback:         DefaultLookback.String(),
 	}
 }
 
-func createLogsReceiver(ctx context.Context, settings receiver.Settings, baseCfg component.Config, consumer consumer.Logs) (receiver.Logs, error) {
-	logger := settings.Logger
-	config := baseCfg.(Config)
-	scraper := NewScraper(config.APIToken, logger)
+// createScraperFactory creates a scraper.Factory for toggltrack logs
+func createScraperFactory(cfg *Config, settings receiver.Settings) scraper.Factory {
+	return scraper.NewFactory(
+		metadata.Type,
+		func() component.Config { return cfg },
+		scraper.WithLogs(func(ctx context.Context, scraperSettings scraper.Settings, scraperCfg component.Config) (scraper.Logs, error) {
+			cfg, ok := scraperCfg.(*Config)
+			if !ok {
+				return nil, fmt.Errorf("invalid config type")
+			}
+			togglTrackScraper := newScraper(cfg, settings)
+			return scraper.NewLogs(
+				togglTrackScraper.scrape,
+				scraper.WithStart(togglTrackScraper.start),
+			)
+		}, component.StabilityLevelAlpha),
+	)
+}
 
-	rcvr := togglTrackReceiver{
-		logger:   logger,
-		consumer: consumer,
-		config:   &config,
-		scraper:  scraper,
+func createLogsReceiver(ctx context.Context, settings receiver.Settings, baseCfg component.Config, consumer consumer.Logs) (receiver.Logs, error) {
+	cfg, ok := baseCfg.(*Config)
+	if !ok {
+		return nil, fmt.Errorf("invalid config type")
 	}
 
-	return &rcvr, nil
+	scraperFactory := createScraperFactory(cfg, settings)
+
+	return scraperhelper.NewLogsController(
+		&cfg.ControllerConfig,
+		settings,
+		consumer,
+		scraperhelper.AddFactoryWithConfig(scraperFactory, cfg),
+	)
 }
 
 func NewFactory() receiver.Factory {

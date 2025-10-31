@@ -5,73 +5,61 @@ import (
 	"time"
 
 	"go.opentelemetry.io/collector/component"
-	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/pdata/plog"
+	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 )
 
-type togglTrackReceiver struct {
-	cancel    context.CancelFunc
-	logger    *zap.Logger
-	consumer  consumer.Logs
-	config    *Config
+// togglTrackScraper is the struct that contains the TogglTrack scraper.
+type togglTrackScraper struct {
+	cfg       *Config
+	settings  component.TelemetrySettings
 	scraper   *Scraper
 	marshaler *timeEntryMarshaler
 }
 
-func (t *togglTrackReceiver) Start(ctx context.Context, host component.Host) error {
-	t.logger.Info("Starting toggltrack receiver")
+// newScraper creates a new TogglTrack scraper.
+func newScraper(cfg *Config, settings receiver.Settings) *togglTrackScraper {
+	return &togglTrackScraper{
+		cfg:       cfg,
+		settings:  settings.TelemetrySettings,
+		scraper:   NewScraper(cfg.APIToken, settings.Logger),
+		marshaler: &timeEntryMarshaler{},
+	}
+}
 
-	_ctx, cancel := context.WithCancel(ctx)
-	t.cancel = cancel
-
-	interval, _ := time.ParseDuration(t.config.Interval)
-	lookback, _ := time.ParseDuration(t.config.Lookback)
-	go func() {
-		ticker := time.NewTicker(interval)
-		defer ticker.Stop()
-
-		for {
-			select {
-			case <-_ctx.Done():
-				return
-			case <-ticker.C:
-				// Do something
-				t.logger.Info("Doing something")
-
-				entries, err := t.scraper.Scrape(time.Now(), lookback)
-				if err != nil {
-					t.logger.Error("Error scraping toggltrack", zap.Error(err))
-					continue
-				}
-
-				t.logger.Info("Scraped toggltrack entries", zap.Int("count", len(entries)))
-
-				if len(entries) == 0 {
-					t.logger.Info("No new entries to process")
-					continue
-				}
-
-				logs, err := t.marshaler.UnmarshalLogs(entries)
-				if err != nil {
-					t.logger.Error("Error marshaling toggltrack entries", zap.Error(err))
-					continue
-				}
-
-				if err := t.consumer.ConsumeLogs(_ctx, logs); err != nil {
-					t.logger.Error("Error consuming toggltrack logs", zap.Error(err))
-				}
-			}
-		}
-	}()
-
+// start initializes the TogglTrack scraper.
+func (s *togglTrackScraper) start(_ context.Context, host component.Host) error {
+	s.settings.Logger.Info("Starting toggltrack scraper")
 	return nil
 }
 
-func (t *togglTrackReceiver) Shutdown(ctx context.Context) error {
-	t.logger.Info("Shutting down toggltrack receiver")
-	if t.cancel != nil {
-		t.cancel()
+// scrape is the main function that scrapes the data from the TogglTrack API.
+func (s *togglTrackScraper) scrape(ctx context.Context) (plog.Logs, error) {
+	lookback, err := time.ParseDuration(s.cfg.Lookback)
+	if err != nil {
+		s.settings.Logger.Error("Error parsing lookback duration", zap.Error(err))
+		return plog.NewLogs(), err
 	}
 
-	return nil
+	entries, err := s.scraper.Scrape(time.Now(), lookback)
+	if err != nil {
+		s.settings.Logger.Error("Error scraping toggltrack", zap.Error(err))
+		return plog.NewLogs(), err
+	}
+
+	s.settings.Logger.Info("Scraped toggltrack entries", zap.Int("count", len(entries)))
+
+	if len(entries) == 0 {
+		s.settings.Logger.Debug("No new entries to process")
+		return plog.NewLogs(), nil
+	}
+
+	logs, err := s.marshaler.UnmarshalLogs(entries)
+	if err != nil {
+		s.settings.Logger.Error("Error marshaling toggltrack entries", zap.Error(err))
+		return plog.NewLogs(), err
+	}
+
+	return logs, nil
 }
