@@ -51,7 +51,7 @@ func (s *togglTrackScraper) scrape(ctx context.Context) (plog.Logs, error) {
 	s.settings.Logger.Info("Scraped toggltrack entries", zap.Int("count", len(entries)))
 
 	if len(entries) == 0 {
-		s.settings.Logger.Debug("No new entries to process")
+		s.settings.Logger.Info("No new entries to process")
 		return plog.NewLogs(), nil
 	}
 
