@@ -7,7 +7,7 @@ go 1.25.1
 require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.138.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension v0.138.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.138.0
+	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.140.1
 	github.com/zmoog/collector/receiver/toggltrackreceiver v0.135.0
 	github.com/zmoog/collector/receiver/wavinsentioreceiver v0.135.0
 	github.com/zmoog/collector/receiver/zcsazzurroreceiver v0.135.0
