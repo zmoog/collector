@@ -19,6 +19,7 @@ import (
 	toggltrackreceiver "github.com/zmoog/collector/receiver/toggltrackreceiver"
 	zcsazzurroreceiver "github.com/zmoog/collector/receiver/zcsazzurroreceiver"
 	wavinsentioreceiver "github.com/zmoog/collector/receiver/wavinsentioreceiver"
+	"go.opentelemetry.io/collector/service/telemetry/otelconftelemetry"
 )
 
 func components() (otelcol.Factories, error) {
@@ -45,9 +46,9 @@ func components() (otelcol.Factories, error) {
 		return otelcol.Factories{}, err
 	}
 	factories.ReceiverModules = make(map[component.Type]string, len(factories.Receivers))
-	factories.ReceiverModules[toggltrackreceiver.NewFactory().Type()] = "github.com/zmoog/collector/receiver/toggltrackreceiver v0.135.0"
-	factories.ReceiverModules[zcsazzurroreceiver.NewFactory().Type()] = "github.com/zmoog/collector/receiver/zcsazzurroreceiver v0.135.0"
-	factories.ReceiverModules[wavinsentioreceiver.NewFactory().Type()] = "github.com/zmoog/collector/receiver/wavinsentioreceiver v0.135.0"
+	factories.ReceiverModules[toggltrackreceiver.NewFactory().Type()] = "github.com/zmoog/collector/receiver/toggltrackreceiver v0.140.1"
+	factories.ReceiverModules[zcsazzurroreceiver.NewFactory().Type()] = "github.com/zmoog/collector/receiver/zcsazzurroreceiver v0.140.1"
+	factories.ReceiverModules[wavinsentioreceiver.NewFactory().Type()] = "github.com/zmoog/collector/receiver/wavinsentioreceiver v0.140.1"
 
 	factories.Exporters, err = otelcol.MakeFactoryMap[exporter.Factory](
 		debugexporter.NewFactory(),
@@ -58,9 +59,9 @@ func components() (otelcol.Factories, error) {
 		return otelcol.Factories{}, err
 	}
 	factories.ExporterModules = make(map[component.Type]string, len(factories.Exporters))
-	factories.ExporterModules[debugexporter.NewFactory().Type()] = "go.opentelemetry.io/collector/exporter/debugexporter v0.135.0"
-	factories.ExporterModules[otlpexporter.NewFactory().Type()] = "go.opentelemetry.io/collector/exporter/otlpexporter v0.135.0"
-	factories.ExporterModules[elasticsearchexporter.NewFactory().Type()] = "github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.135.0"
+	factories.ExporterModules[debugexporter.NewFactory().Type()] = "go.opentelemetry.io/collector/exporter/debugexporter v0.140.1"
+	factories.ExporterModules[otlpexporter.NewFactory().Type()] = "go.opentelemetry.io/collector/exporter/otlpexporter v0.140.1"
+	factories.ExporterModules[elasticsearchexporter.NewFactory().Type()] = "github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.140.1"
 
 	factories.Processors, err = otelcol.MakeFactoryMap[processor.Factory](
 		batchprocessor.NewFactory(),
@@ -69,7 +70,7 @@ func components() (otelcol.Factories, error) {
 		return otelcol.Factories{}, err
 	}
 	factories.ProcessorModules = make(map[component.Type]string, len(factories.Processors))
-	factories.ProcessorModules[batchprocessor.NewFactory().Type()] = "go.opentelemetry.io/collector/processor/batchprocessor v0.135.0"
+	factories.ProcessorModules[batchprocessor.NewFactory().Type()] = "go.opentelemetry.io/collector/processor/batchprocessor v0.140.1"
 
 	factories.Connectors, err = otelcol.MakeFactoryMap[connector.Factory](
 	)
@@ -77,6 +78,8 @@ func components() (otelcol.Factories, error) {
 		return otelcol.Factories{}, err
 	}
 	factories.ConnectorModules = make(map[component.Type]string, len(factories.Connectors))
+
+	factories.Telemetry = otelconftelemetry.NewFactory()
 
 	return factories, nil
 }
