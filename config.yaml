@@ -6,8 +6,8 @@ receivers:
     # For interval and lookback, valid time units are:
     # "ns", "us" (or "µs"), "ms", "s", "m", "h".
     # See https://pkg.go.dev/time#Duration.Parse
-    interval: ${env:TOGGL_INTERVAL:-5m}
-    lookback: ${env:TOGGL_LOOKBACK:-720h} # 24h * 30 = 30 days
+    collection_interval: ${env:TOGGL_INTERVAL:-5m}
+    # lookback: ${env:TOGGL_LOOKBACK:-2160h} # 2160h = 90 days
     api_token: ${env:TOGGL_API_TOKEN}
   wavinsentio:
     collection_interval: ${env:WS_INTERVAL:-60s}
@@ -31,32 +31,34 @@ exporters:
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/elasticsearchexporter
   elasticsearch:
     endpoints: ${env:ELASTICSEARCH_ENDPOINTS}
-    auth:
-      authenticator: basicauth
+    headers:
+      Authorization: "ApiKey ${env:ELASTICSEARCH_API_KEY}"    
+    # auth:
+    #   authenticator: basicauth
 
   otlp/elastic:
     endpoint: ${env:ELASTICSEARCH_ENDPOINTS}
     headers:
       Authorization: "ApiKey ${env:ELASTICSEARCH_API_KEY}"
 
-extensions:
-  basicauth:
-    client_auth:
-      username: ${env:ELASTICSEARCH_USERNAME}
-      password: ${env:ELASTICSEARCH_PASSWORD}
+# extensions:
+#   basicauth:
+#     client_auth:
+#       username: ${env:ELASTICSEARCH_USERNAME}
+#       password: ${env:ELASTICSEARCH_PASSWORD}
 
 service:
-  extensions: [basicauth]
+  # extensions: [basicauth]
   pipelines:
-    # logs:
-    #   receivers: [toggltrack]
-    #   exporters: [otlp/elastic]
+    logs:
+      receivers: [toggltrack]
+      exporters: [elasticsearch]
     metrics:
-      receivers: [zcsazzurro]
+      receivers: [wavinsentio, zcsazzurro]
       exporters: [otlp/elastic]
   telemetry:
     resource:
       service.name: "collector"
     logs:
       level: info
-      # encoding: json
+      encoding: json
