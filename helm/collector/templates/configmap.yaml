@@ -11,8 +11,7 @@ data:
         # For interval and lookback, valid time units are:
         # "ns", "us" (or "µs"), "ms", "s", "m", "h".
         # See https://pkg.go.dev/time#Duration.Parse
-        interval: {{ .Values.toggl.interval }}
-        lookback: {{ .Values.toggl.lookback }}
+        collection_interval: {{ .Values.toggl.collection_interval }}
         api_token: {{ .Values.toggl.api_token }}
       wavinsentio:
         collection_interval: {{ .Values.wavinsentio.collection_interval }}
@@ -21,7 +20,7 @@ data:
         password: {{ .Values.wavinsentio.password }}
         web_api_key: {{ .Values.wavinsentio.web_api_key }}
       zcsazzurro:
-        interval: {{ .Values.zcsazzurro.interval }}
+        collection_interval: {{ .Values.zcsazzurro.collection_interval }}
         client_id: {{ .Values.zcsazzurro.client_id }}
         auth_key: {{ .Values.zcsazzurro.auth_key }}
         thing_key: {{ .Values.zcsazzurro.thing_key }}

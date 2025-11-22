@@ -30,15 +30,14 @@ wavinsentio:
   web_api_key: "AIzaSyBlAtNI7-2jitPul9I-O4EZcT-n0sIay-g"
 
 zcsazzurro:
-  interval: "5m"
+  collection_interval: "5m"
   client_id: ""
   auth_key: ""
   thing_key: ""
 
 toggl:
-  interval: "5m"
+  collection_interval: "5m"
   api_token: ""
-  lookback: "720h"
 
 telemetry:
   log:
