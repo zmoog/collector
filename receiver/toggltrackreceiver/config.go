@@ -12,10 +12,22 @@ const (
 	MinLookback           = 1 * time.Hour
 )
 
+// mapping is a map of an ID to a name.
+type Mapping map[string]string
+
+// mappings is a collection of mappings for workspace,
+// project, and task IDs to names.
+type Mappings struct {
+	Workspaces Mapping `mapstructure:"workspaces"`
+	Projects   Mapping `mapstructure:"projects"`
+	Tasks      Mapping `mapstructure:"tasks"`
+}
+
 type Config struct {
 	scraperhelper.ControllerConfig `mapstructure:",squash"`
-	Lookback                       string `mapstructure:"lookback"`
-	APIToken                       string `mapstructure:"api_token"`
+	Lookback                       string   `mapstructure:"lookback"`
+	APIToken                       string   `mapstructure:"api_token"`
+	Mappings                       Mappings `mapstructure:"mappings"`
 }
 
 func (cfg *Config) Validate() error {

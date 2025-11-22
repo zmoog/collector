@@ -37,6 +37,13 @@ staticcheck:
 	# file present
 	find . -name go.mod -execdir go tool staticcheck ./... \;
 
+.PHONY: test
+test:
+	# run tests for all go
+	# directories that have a go.mod
+	# file present
+	find . -name go.mod -execdir go test ./... \;
+
 .PHONY: check
 check: generate staticcheck fmt
 

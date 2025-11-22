@@ -2,7 +2,6 @@ package toggltrackreceiver
 
 import (
 	"context"
-	"time"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/pdata/plog"
@@ -14,7 +13,7 @@ import (
 type togglTrackScraper struct {
 	cfg       *Config
 	settings  component.TelemetrySettings
-	scraper   *Scraper
+	scraper   *accountScraper
 	marshaler *timeEntryMarshaler
 }
 
@@ -24,7 +23,7 @@ func newScraper(cfg *Config, settings receiver.Settings) *togglTrackScraper {
 		cfg:       cfg,
 		settings:  settings.TelemetrySettings,
 		scraper:   NewScraper(cfg.APIToken, settings.Logger),
-		marshaler: &timeEntryMarshaler{},
+		marshaler: newTimeEntryMarshaler(cfg.Mappings),
 	}
 }
 
@@ -36,26 +35,27 @@ func (s *togglTrackScraper) start(_ context.Context, host component.Host) error 
 
 // scrape is the main function that scrapes the data from the TogglTrack API.
 func (s *togglTrackScraper) scrape(ctx context.Context) (plog.Logs, error) {
-	lookback, err := time.ParseDuration(s.cfg.Lookback)
-	if err != nil {
-		s.settings.Logger.Error("Error parsing lookback duration", zap.Error(err))
-		return plog.NewLogs(), err
-	}
+	// lookback, err := time.ParseDuration(s.cfg.Lookback)
+	// if err != nil {
+	// 	s.settings.Logger.Error("Error parsing lookback duration", zap.Error(err))
+	// 	return plog.NewLogs(), err
+	// }
 
-	entries, err := s.scraper.Scrape(time.Now(), lookback)
+	// _, entries, err := s.scraper.Scrape(time.Now(), lookback)
+	account, err := s.scraper.Scrape()
 	if err != nil {
 		s.settings.Logger.Error("Error scraping toggltrack", zap.Error(err))
 		return plog.NewLogs(), err
 	}
 
-	s.settings.Logger.Info("Scraped toggltrack entries", zap.Int("count", len(entries)))
+	s.settings.Logger.Info("Scraped toggltrack entries", zap.Int("count", len(account.TimeEntries)))
 
-	if len(entries) == 0 {
-		s.settings.Logger.Info("No new entries to process")
-		return plog.NewLogs(), nil
-	}
+	// if len(account.TimeEntries) == 0 {
+	// 	s.settings.Logger.Info("No new entries to process")
+	// 	return plog.NewLogs(), nil
+	// }
 
-	logs, err := s.marshaler.UnmarshalLogs(entries)
+	logs, err := s.marshaler.UnmarshalLogs(account)
 	if err != nil {
 		s.settings.Logger.Error("Error marshaling toggltrack entries", zap.Error(err))
 		return plog.NewLogs(), err
