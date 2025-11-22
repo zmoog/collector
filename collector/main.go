@@ -39,7 +39,7 @@ func main() {
 		ConverterModules: []string{},
 	}
 
-	if err := runInteractive(set); err != nil {
+	if err := run(set); err != nil {
 		log.Fatal(err)
 	}
 }
