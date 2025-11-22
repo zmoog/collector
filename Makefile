@@ -51,10 +51,6 @@ check: generate staticcheck fmt
 fmt:
 	go tool goimports -local github.com/zmoog/ -w .
 
-.PHONY: collector-source
-collector-source: generate
-	cd collector && go tool builder --config ./builder-config.yaml
-
 .PHONY: run
 run:
 	# cd collector && ./otelcol --config ../config.yaml
