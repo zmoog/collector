@@ -21,7 +21,8 @@ The following settings are required:
 
 The following settings can be optionally configured:
 
-- `interval` (default = 1m): Specifies the time interval between polls to fetch time entries from the Toggl API.
+- `collection_interval` (default = 1m): Specifies the time interval between polls to fetch time entries from the Toggl API.
+- `lookback` (default = 720h): Specifies the time range to look back when fetching time entries.
 
 ### Example configurations
 
@@ -30,7 +31,8 @@ Using connection string for authentication:
 ```yaml
   toggltrack:
     api_token: ${TOGGL_API_TOKEN}
-    interval: 30m
+    collection_interval: 30m
+    lookback: 720h  # 30 days
 ```
 
 ## Limitations
