@@ -42,14 +42,14 @@ jobs:
           version: latest
           args: --timeout=5m
 
-    # - name: Test
-    #   run: |
-    #     cd receiver/${{ matrix.receiver }}
-    #     go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+    - name: Test
+      run: |
+        cd receiver/${{ matrix.receiver }}
+        go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
-    # - name: Upload coverage
-    #   uses: codecov/codecov-action@v4
-    #   with:
-    #     file: ./receiver/${{ matrix.receiver }}/coverage.txt
-    #     flags: ${{ matrix.receiver }}
-    #     name: ${{ matrix.receiver }}
+    - name: Upload coverage
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./receiver/${{ matrix.receiver }}/coverage.txt
+        flags: ${{ matrix.receiver }}
+        name: ${{ matrix.receiver }}
