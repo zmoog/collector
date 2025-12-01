@@ -147,7 +147,7 @@ require (
 	go.mongodb.org/mongo-driver v1.17.3 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/collector/cmd/builder v0.136.0 // indirect
-	go.opentelemetry.io/collector/cmd/mdatagen v0.136.0 // indirect
+	go.opentelemetry.io/collector/cmd/mdatagen v0.141.0 // indirect
 	go.opentelemetry.io/collector/component v1.42.0 // indirect
 	go.opentelemetry.io/collector/confmap v1.42.0 // indirect
 	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.42.0 // indirect
