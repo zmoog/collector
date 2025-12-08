@@ -27,7 +27,8 @@ require (
 	go.opentelemetry.io/collector/processor v1.46.0
 	go.opentelemetry.io/collector/processor/batchprocessor v0.140.0
 	go.opentelemetry.io/collector/receiver v1.46.0
-	golang.org/x/sys v0.37.0
+	go.opentelemetry.io/collector/service v0.140.0
+	golang.org/x/sys v0.39.0
 )
 
 require (
@@ -146,7 +147,6 @@ require (
 	go.opentelemetry.io/collector/receiver/xreceiver v0.140.0 // indirect
 	go.opentelemetry.io/collector/scraper v0.140.0 // indirect
 	go.opentelemetry.io/collector/scraper/scraperhelper v0.140.0 // indirect
-	go.opentelemetry.io/collector/service v0.140.0 // indirect
 	go.opentelemetry.io/collector/service/hostcapabilities v0.140.0 // indirect
 	go.opentelemetry.io/contrib/bridges/otelzap v0.13.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.63.0 // indirect
