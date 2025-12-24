@@ -31,9 +31,15 @@ wavinsentio:
 
 zcsazzurro:
   collection_interval: "5m"
-  client_id: ""
-  auth_key: ""
-  thing_key: ""
+  things:
+    - name: "thing1"
+      client_id: ""
+      auth_key: ""
+      thing_key: ""
+    # - name: "thing2"
+    #   client_id: ""
+    #   auth_key: ""
+    #   thing_key: ""
 
 toggl:
   collection_interval: "5m"
