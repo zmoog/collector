@@ -19,11 +19,13 @@ data:
         username: {{ .Values.wavinsentio.username }}
         password: {{ .Values.wavinsentio.password }}
         web_api_key: {{ .Values.wavinsentio.web_api_key }}
-      zcsazzurro:
-        collection_interval: {{ .Values.zcsazzurro.collection_interval }}
-        client_id: {{ .Values.zcsazzurro.client_id }}
-        auth_key: {{ .Values.zcsazzurro.auth_key }}
-        thing_key: {{ .Values.zcsazzurro.thing_key }}
+{{- range .Values.zcsazzurro.things }}
+      zcsazzurro/{{ .name }}:
+        collection_interval: {{ $.Values.zcsazzurro.collection_interval }}
+        client_id: {{ .client_id }}
+        auth_key: {{ .auth_key }}
+        thing_key: {{ .thing_key }}
+{{- end }}
     processors:
       batch:
 
@@ -35,37 +37,27 @@ data:
       # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/elasticsearchexporter
       elasticsearch:
         endpoints: "{{ .Values.elasticsearch.endpoints }}"
-        auth:
-          authenticator: basicauth
-
-      otlp/elastic:
-        endpoint: "{{ .Values.elasticsearch.endpoints }}"
         headers:
           Authorization: "ApiKey {{ .Values.elasticsearch.api_key }}"
 
     extensions:
-      basicauth:
-        client_auth:
-          username: {{ .Values.elasticsearch.username }}
-          password: {{ .Values.elasticsearch.password }}
       health_check:
         endpoint: :13133
 
     service:
       extensions:
-      - basicauth
       - health_check
       pipelines:
-        # logs:
-        #   receivers: [toggltrack]
-        #   exporters: [elasticsearch]
+        logs:
+          receivers: [toggltrack]
+          exporters: [elasticsearch] # mOTLP is not available on ECH/Azure yet
         metrics:
-          receivers: [wavinsentio, zcsazzurro]
-          exporters: [otlp/elastic]
+          receivers: [wavinsentio{{- range .Values.zcsazzurro.things }}, zcsazzurro/{{ .name }}{{- end }}]
+          exporters: [elasticsearch] # mOTLP is not available on ECH/Azure yet
       telemetry:
         resource:
           service.name: "{{ .Release.Name }}"
           service.version: "{{ .Chart.AppVersion }}"
         logs:
-          level: debug
-          # encoding: json
+          level: {{ .Values.telemetry.log.level | default "info" }}
+          encoding: {{ .Values.telemetry.log.encoding | default "json" }}
