@@ -1,0 +1,7 @@
+type: shellycloud
+scope_name: github.com/zmoog/collector/shellycloud
+
+status:
+  class: receiver
+  stability:
+    development: [metrics]
