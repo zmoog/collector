@@ -125,8 +125,9 @@ type roomEntry struct {
 }
 
 type deviceStatusResponse struct {
-	IsOk bool             `json:"isok"`
-	Data deviceStatusData `json:"data"`
+	IsOk   bool             `json:"isok"`
+	Errors json.RawMessage  `json:"errors"`
+	Data   deviceStatusData `json:"data"`
 }
 
 type deviceStatusData struct {
@@ -212,7 +213,7 @@ func (c *Client) GetDeviceStatus(deviceID string) (*DeviceStatus, error) {
 		return nil, fmt.Errorf("parse device status: %w", err)
 	}
 	if !dsr.IsOk {
-		return nil, fmt.Errorf("Shelly Cloud API error on device status for %s", deviceID)
+		return nil, fmt.Errorf("Shelly Cloud API error on device status for %s: %s", deviceID, string(dsr.Errors))
 	}
 
 	return parseDeviceStatus(dsr.Data.DeviceStatus)
