@@ -4,6 +4,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
+	"github.com/zmoog/collector/receiver/shellycloudreceiver"
 	"github.com/zmoog/collector/receiver/toggltrackreceiver"
 	"github.com/zmoog/collector/receiver/wavinsentioreceiver"
 	"github.com/zmoog/collector/receiver/zcsazzurroreceiver"
@@ -33,6 +34,7 @@ func components() (otelcol.Factories, error) {
 	}
 
 	factories.Receivers, err = otelcol.MakeFactoryMap[receiver.Factory](
+		shellycloudreceiver.NewFactory(),
 		toggltrackreceiver.NewFactory(),
 		zcsazzurroreceiver.NewFactory(),
 		wavinsentioreceiver.NewFactory(),

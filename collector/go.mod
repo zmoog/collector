@@ -9,6 +9,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension v0.142.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.142.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.142.0
+	github.com/zmoog/collector/receiver/shellycloudreceiver v0.0.0
 	github.com/zmoog/collector/receiver/toggltrackreceiver v0.0.0
 	github.com/zmoog/collector/receiver/wavinsentioreceiver v0.0.0
 	github.com/zmoog/collector/receiver/zcsazzurroreceiver v0.0.0
@@ -211,6 +212,8 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/zmoog/collector/receiver/shellycloudreceiver v0.0.0 => ../receiver/shellycloudreceiver
 
 replace github.com/zmoog/collector/receiver/toggltrackreceiver v0.0.0 => ../receiver/toggltrackreceiver
 
