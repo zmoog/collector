@@ -24,6 +24,7 @@ func createDefaultConfig() component.Config {
 	cfg.CollectionInterval = DefaultCollectionInterval
 	return &Config{
 		ControllerConfig: cfg,
+		RequestDelay:     DefaultRequestDelay,
 	}
 }
 

@@ -131,6 +131,7 @@ type deviceStatusResponse struct {
 }
 
 type deviceStatusData struct {
+	Online       bool                       `json:"online"`
 	DeviceStatus map[string]json.RawMessage `json:"device_status"`
 }
 
@@ -214,6 +215,9 @@ func (c *Client) GetDeviceStatus(deviceID string) (*DeviceStatus, error) {
 	}
 	if !dsr.IsOk {
 		return nil, fmt.Errorf("Shelly Cloud API error on device status for %s: %s", deviceID, string(dsr.Errors))
+	}
+	if !dsr.Data.Online {
+		return nil, nil
 	}
 
 	return parseDeviceStatus(dsr.Data.DeviceStatus)

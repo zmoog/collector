@@ -2,6 +2,7 @@ package shellycloudreceiver
 
 import (
 	"context"
+	"time"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/pdata/pmetric"
@@ -37,7 +38,9 @@ func (s *shellyScraper) scrape(_ context.Context) (pmetric.Metrics, error) {
 	s.settings.Logger.Info("Fetched Shelly devices", zap.Int("channels", len(channels)))
 
 	// Fetch status once per physical device (multi-channel devices share a base ID).
+	// A delay between calls avoids Shelly Cloud rate limiting.
 	statusByBaseID := make(map[string]*DeviceStatus)
+	first := true
 	for _, ch := range channels {
 		if !ch.CloudOnline {
 			continue
@@ -45,6 +48,11 @@ func (s *shellyScraper) scrape(_ context.Context) (pmetric.Metrics, error) {
 		if _, already := statusByBaseID[ch.BaseID]; already {
 			continue
 		}
+		if !first {
+			time.Sleep(s.cfg.RequestDelay)
+		}
+		first = false
+
 		status, err := s.client.GetDeviceStatus(ch.BaseID)
 		if err != nil {
 			s.settings.Logger.Error("Failed to get device status",
@@ -52,6 +60,10 @@ func (s *shellyScraper) scrape(_ context.Context) (pmetric.Metrics, error) {
 				zap.Error(err))
 			statusByBaseID[ch.BaseID] = nil
 			continue
+		}
+		if status == nil {
+			s.settings.Logger.Debug("Device offline per status response",
+				zap.String("id", ch.BaseID))
 		}
 		statusByBaseID[ch.BaseID] = status
 	}
