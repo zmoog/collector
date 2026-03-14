@@ -48,6 +48,16 @@ type Room struct {
 	Name string
 }
 
+// WifiStatus holds WiFi signal and network metadata.
+// Gen1 uses the "wifi_sta" key; Gen2+ uses "wifi".
+type WifiStatus struct {
+	SSID      string  `json:"ssid"`
+	IP        string  `json:"ip"`     // Gen1: "ip", Gen2+: "sta_ip"
+	StaIP     string  `json:"sta_ip"` // Gen2+ only
+	RSSI      int     `json:"rssi"`   // dBm
+	Connected bool    `json:"connected"`
+}
+
 // DeviceStatus holds the parsed metrics for a single physical device,
 // normalised across Gen1 and Gen2+ formats.
 type DeviceStatus struct {
@@ -59,6 +69,8 @@ type DeviceStatus struct {
 	Relays []Gen1Relay
 	// Gen1: device-level temperature (°C)
 	Temperature float64
+	// WiFi signal and network info (all generations)
+	Wifi WifiStatus
 }
 
 type SwitchStatus struct {
@@ -253,6 +265,20 @@ func parseDeviceStatus(raw map[string]json.RawMessage) (*DeviceStatus, error) {
 			if err := json.Unmarshal(value, &status.Temperature); err != nil {
 				// Some Gen1 models nest this; ignore parse failures.
 				status.Temperature = 0
+			}
+
+		case key == "wifi_sta": // Gen1
+			if err := json.Unmarshal(value, &status.Wifi); err != nil {
+				return nil, fmt.Errorf("parse wifi_sta: %w", err)
+			}
+
+		case key == "wifi": // Gen2+
+			if err := json.Unmarshal(value, &status.Wifi); err != nil {
+				return nil, fmt.Errorf("parse wifi: %w", err)
+			}
+			// Gen2+ uses "sta_ip" instead of "ip"
+			if status.Wifi.IP == "" {
+				status.Wifi.IP = status.Wifi.StaIP
 			}
 		}
 	}

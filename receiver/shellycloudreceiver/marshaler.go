@@ -76,6 +76,9 @@ func (m *shellyMarshaler) marshalGen1(sm pmetric.ScopeMetrics, d deviceData, cha
 	if d.status.Temperature != 0 {
 		m.addGaugeFloat(sm, "shelly.device.temperature", "Device internal temperature", "Cel", channel, d.status.Temperature, now)
 	}
+	if d.status.Wifi.RSSI != 0 {
+		m.addGaugeInt(sm, "shelly.wifi.rssi", "WiFi signal strength", "dBm", channel, d.status.Wifi.RSSI, now)
+	}
 }
 
 func (m *shellyMarshaler) marshalGen2(sm pmetric.ScopeMetrics, d deviceData, channel string, now pcommon.Timestamp) {
@@ -94,6 +97,9 @@ func (m *shellyMarshaler) marshalGen2(sm pmetric.ScopeMetrics, d deviceData, cha
 	if sw.Temperature.TC != 0 {
 		m.addGaugeFloat(sm, "shelly.device.temperature", "Device internal temperature", "Cel", channel, sw.Temperature.TC, now)
 	}
+	if d.status.Wifi.RSSI != 0 {
+		m.addGaugeInt(sm, "shelly.wifi.rssi", "WiFi signal strength", "dBm", channel, d.status.Wifi.RSSI, now)
+	}
 }
 
 func (m *shellyMarshaler) setResourceAttrs(res pcommon.Resource, d deviceData) {
@@ -101,6 +107,12 @@ func (m *shellyMarshaler) setResourceAttrs(res pcommon.Resource, d deviceData) {
 	res.Attributes().PutStr("shelly.device.name", d.info.Name)
 	res.Attributes().PutStr("shelly.device.model", d.info.Type)
 	res.Attributes().PutStr("shelly.device.room", d.room)
+	if d.status.Wifi.SSID != "" {
+		res.Attributes().PutStr("shelly.wifi.ssid", d.status.Wifi.SSID)
+	}
+	if d.status.Wifi.IP != "" {
+		res.Attributes().PutStr("shelly.wifi.ip", d.status.Wifi.IP)
+	}
 }
 
 func (m *shellyMarshaler) addSwitchState(sm pmetric.ScopeMetrics, channel string, on bool, ts pcommon.Timestamp) {
@@ -115,6 +127,17 @@ func (m *shellyMarshaler) addSwitchState(sm pmetric.ScopeMetrics, channel string
 	} else {
 		dp.SetIntValue(0)
 	}
+}
+
+func (m *shellyMarshaler) addGaugeInt(sm pmetric.ScopeMetrics, name, desc, unit, channel string, value int, ts pcommon.Timestamp) {
+	metric := sm.Metrics().AppendEmpty()
+	metric.SetName(name)
+	metric.SetDescription(desc)
+	metric.SetUnit(unit)
+	dp := metric.SetEmptyGauge().DataPoints().AppendEmpty()
+	dp.Attributes().PutStr("shelly.channel", channel)
+	dp.SetIntValue(int64(value))
+	dp.SetTimestamp(ts)
 }
 
 func (m *shellyMarshaler) addGaugeFloat(sm pmetric.ScopeMetrics, name, desc, unit, channel string, value float64, ts pcommon.Timestamp) {
