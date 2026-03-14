@@ -25,13 +25,21 @@ func newClient(serverURL, authKey string) *Client {
 	}
 }
 
-// DeviceInfo contains basic device metadata from the Shelly Cloud.
+// DeviceInfo contains per-channel device metadata from the Shelly Cloud device list.
+// Multi-channel devices (e.g. S4PL-00416EU) appear as separate entries per channel,
+// each with its own name and room, so this struct represents one channel.
 type DeviceInfo struct {
-	ID     string
-	Name   string
-	Type   string
-	RoomID int
-	Online bool
+	// ID is the channel-scoped identifier, e.g. "98a3167ba5d8_1" for channel 1.
+	ID string
+	// BaseID is the physical device ID used for status API calls, e.g. "98a3167ba5d8".
+	BaseID        string
+	Name          string
+	Type          string
+	Gen           int
+	Channel       int
+	ChannelsCount int
+	RoomID        int
+	CloudOnline   bool
 }
 
 // Room contains room metadata.
@@ -40,10 +48,10 @@ type Room struct {
 	Name string
 }
 
-// DeviceStatus holds the parsed metrics for a single device,
-// normalised across Gen1 and Gen2 formats.
+// DeviceStatus holds the parsed metrics for a single physical device,
+// normalised across Gen1 and Gen2+ formats.
 type DeviceStatus struct {
-	// Gen2: one entry per switch component, keyed by channel index ("0", "1", …)
+	// Gen2+: one entry per switch component, keyed by channel index ("0", "1", …)
 	Switches map[string]SwitchStatus
 	// Gen1: one entry per meter channel
 	Meters []Gen1Meter
@@ -83,28 +91,32 @@ type Gen1Relay struct {
 
 // --- internal API response types ---
 
-type deviceCollectionResponse struct {
-	IsOk bool                 `json:"isok"`
-	Data deviceCollectionData `json:"data"`
+type deviceListResponse struct {
+	IsOk bool           `json:"isok"`
+	Data deviceListData `json:"data"`
 }
 
-type deviceCollectionData struct {
-	DevicesStatus map[string]deviceEntry `json:"devices_status"`
+type deviceListData struct {
+	Devices map[string]deviceEntry `json:"devices"`
 }
 
 type deviceEntry struct {
-	Name   string `json:"name"`
-	Type   string `json:"type"`
-	RoomID int    `json:"room_id"`
-	Online bool   `json:"online"`
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	Type          string `json:"type"`
+	Gen           int    `json:"gen"`
+	Channel       int    `json:"channel"`
+	ChannelsCount int    `json:"channels_count"`
+	RoomID        int    `json:"room_id"`
+	CloudOnline   bool   `json:"cloud_online"`
 }
 
-type roomCollectionResponse struct {
-	IsOk bool             `json:"isok"`
-	Data roomCollectionData `json:"data"`
+type roomListResponse struct {
+	IsOk bool         `json:"isok"`
+	Data roomListData `json:"data"`
 }
 
-type roomCollectionData struct {
+type roomListData struct {
 	Rooms map[string]roomEntry `json:"rooms"`
 }
 
@@ -121,35 +133,41 @@ type deviceStatusData struct {
 	DeviceStatus map[string]json.RawMessage `json:"device_status"`
 }
 
-// ListDevices returns all devices registered in the Shelly Cloud account
+// ListDevices returns all channel entries from the Shelly Cloud account
 // together with a room ID→Room map for name resolution.
+// The room map may be empty if the rooms endpoint returns an error.
 func (c *Client) ListDevices() ([]DeviceInfo, map[int]Room, error) {
-	body, err := c.post("/interface/device/collection", url.Values{"auth_key": {c.authKey}})
+	body, err := c.get("/interface/device/list", url.Values{"auth_key": {c.authKey}})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dcr deviceCollectionResponse
-	if err := json.Unmarshal(body, &dcr); err != nil {
-		return nil, nil, fmt.Errorf("parse device collection: %w", err)
+	var dlr deviceListResponse
+	if err := json.Unmarshal(body, &dlr); err != nil {
+		return nil, nil, fmt.Errorf("parse device list: %w", err)
 	}
-	if !dcr.IsOk {
-		return nil, nil, fmt.Errorf("Shelly Cloud API error on device collection")
+	if !dlr.IsOk {
+		return nil, nil, fmt.Errorf("Shelly Cloud API error on device list")
 	}
 
 	rooms, err := c.listRooms()
 	if err != nil {
-		return nil, nil, err
+		// Non-fatal: proceed without room names.
+		rooms = map[int]Room{}
 	}
 
-	devices := make([]DeviceInfo, 0, len(dcr.Data.DevicesStatus))
-	for id, entry := range dcr.Data.DevicesStatus {
+	devices := make([]DeviceInfo, 0, len(dlr.Data.Devices))
+	for _, entry := range dlr.Data.Devices {
 		devices = append(devices, DeviceInfo{
-			ID:     id,
-			Name:   entry.Name,
-			Type:   entry.Type,
-			RoomID: entry.RoomID,
-			Online: entry.Online,
+			ID:            entry.ID,
+			BaseID:        baseDeviceID(entry.ID),
+			Name:          entry.Name,
+			Type:          entry.Type,
+			Gen:           entry.Gen,
+			Channel:       entry.Channel,
+			ChannelsCount: entry.ChannelsCount,
+			RoomID:        entry.RoomID,
+			CloudOnline:   entry.CloudOnline,
 		})
 	}
 
@@ -157,21 +175,21 @@ func (c *Client) ListDevices() ([]DeviceInfo, map[int]Room, error) {
 }
 
 func (c *Client) listRooms() (map[int]Room, error) {
-	body, err := c.post("/interface/room/collection", url.Values{"auth_key": {c.authKey}})
+	body, err := c.get("/interface/room/list", url.Values{"auth_key": {c.authKey}})
 	if err != nil {
 		return nil, err
 	}
 
-	var rcr roomCollectionResponse
-	if err := json.Unmarshal(body, &rcr); err != nil {
-		return nil, fmt.Errorf("parse room collection: %w", err)
+	var rlr roomListResponse
+	if err := json.Unmarshal(body, &rlr); err != nil {
+		return nil, fmt.Errorf("parse room list: %w", err)
 	}
-	if !rcr.IsOk {
-		return nil, fmt.Errorf("Shelly Cloud API error on room collection")
+	if !rlr.IsOk {
+		return nil, fmt.Errorf("Shelly Cloud API error on room list")
 	}
 
-	rooms := make(map[int]Room, len(rcr.Data.Rooms))
-	for idStr, entry := range rcr.Data.Rooms {
+	rooms := make(map[int]Room, len(rlr.Data.Rooms))
+	for idStr, entry := range rlr.Data.Rooms {
 		id, _ := strconv.Atoi(idStr)
 		rooms[id] = Room{ID: id, Name: entry.Name}
 	}
@@ -179,9 +197,9 @@ func (c *Client) listRooms() (map[int]Room, error) {
 	return rooms, nil
 }
 
-// GetDeviceStatus fetches and parses the current status for the given device ID.
+// GetDeviceStatus fetches and parses the current status for a physical device ID.
 func (c *Client) GetDeviceStatus(deviceID string) (*DeviceStatus, error) {
-	body, err := c.post("/device/status", url.Values{
+	body, err := c.get("/device/status", url.Values{
 		"auth_key": {c.authKey},
 		"id":       {deviceID},
 	})
@@ -200,8 +218,7 @@ func (c *Client) GetDeviceStatus(deviceID string) (*DeviceStatus, error) {
 	return parseDeviceStatus(dsr.Data.DeviceStatus)
 }
 
-// parseDeviceStatus detects Gen1 vs Gen2 from the raw JSON keys and
-// returns a unified DeviceStatus.
+// parseDeviceStatus detects Gen1 vs Gen2+ from the raw JSON keys.
 func parseDeviceStatus(raw map[string]json.RawMessage) (*DeviceStatus, error) {
 	status := &DeviceStatus{
 		Switches: make(map[string]SwitchStatus),
@@ -214,8 +231,7 @@ func parseDeviceStatus(raw map[string]json.RawMessage) (*DeviceStatus, error) {
 			if err := json.Unmarshal(value, &sw); err != nil {
 				return nil, fmt.Errorf("parse switch %s: %w", key, err)
 			}
-			channel := strings.TrimPrefix(key, "switch:")
-			status.Switches[channel] = sw
+			status.Switches[strings.TrimPrefix(key, "switch:")] = sw
 
 		case key == "meters":
 			if err := json.Unmarshal(value, &status.Meters); err != nil {
@@ -230,7 +246,7 @@ func parseDeviceStatus(raw map[string]json.RawMessage) (*DeviceStatus, error) {
 		case key == "temperature":
 			// Gen1 reports device temperature as a bare float.
 			if err := json.Unmarshal(value, &status.Temperature); err != nil {
-				// Some Gen1 models use an object; ignore parse failures here.
+				// Some Gen1 models nest this; ignore parse failures.
 				status.Temperature = 0
 			}
 		}
@@ -239,12 +255,23 @@ func parseDeviceStatus(raw map[string]json.RawMessage) (*DeviceStatus, error) {
 	return status, nil
 }
 
-func (c *Client) post(path string, data url.Values) ([]byte, error) {
-	req, err := http.NewRequest(http.MethodPost, c.serverURL+path, strings.NewReader(data.Encode()))
+// baseDeviceID strips the channel suffix from a device ID.
+// "98a3167ba5d8_1" → "98a3167ba5d8", "80646f83ea3b" → "80646f83ea3b".
+func baseDeviceID(id string) string {
+	if idx := strings.LastIndex(id, "_"); idx != -1 {
+		if _, err := strconv.Atoi(id[idx+1:]); err == nil {
+			return id[:idx]
+		}
+	}
+	return id
+}
+
+func (c *Client) get(path string, params url.Values) ([]byte, error) {
+	u := c.serverURL + path + "?" + params.Encode()
+	req, err := http.NewRequest(http.MethodGet, u, nil)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {

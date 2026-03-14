@@ -1,7 +1,7 @@
 package shellycloudreceiver
 
 import (
-	"fmt"
+	"strconv"
 	"time"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -28,6 +28,9 @@ func newMarshaler(logger *zap.Logger) *shellyMarshaler {
 	return &shellyMarshaler{logger: logger}
 }
 
+// MarshalMetrics emits one ResourceMetrics per channel entry.
+// Each channel already has its own name and room from the device list,
+// so the channel index is used only to select the right status data.
 func (m *shellyMarshaler) MarshalMetrics(devices []deviceData) (pmetric.Metrics, error) {
 	md := pmetric.NewMetrics()
 	now := pcommon.NewTimestampFromTime(time.Now())
@@ -37,51 +40,60 @@ func (m *shellyMarshaler) MarshalMetrics(devices []deviceData) (pmetric.Metrics,
 			continue
 		}
 
-		// Gen2: switch:N components
-		for channel, sw := range d.status.Switches {
-			rm := md.ResourceMetrics().AppendEmpty()
-			m.setResourceAttrs(rm.Resource(), d)
+		channel := strconv.Itoa(d.info.Channel)
 
-			sm := rm.ScopeMetrics().AppendEmpty()
-			sm.Scope().SetName(scopeName)
-			sm.Scope().SetVersion(scopeVersion)
+		rm := md.ResourceMetrics().AppendEmpty()
+		m.setResourceAttrs(rm.Resource(), d)
 
-			m.addSwitchState(sm, channel, sw.Output, now)
-			m.addGaugeFloat(sm, "shelly.switch.power", "Active power", "W", channel, sw.APower, now)
-			m.addGaugeFloat(sm, "shelly.switch.voltage", "RMS voltage", "V", channel, sw.Voltage, now)
-			m.addGaugeFloat(sm, "shelly.switch.current", "RMS current", "A", channel, sw.Current, now)
-			m.addGaugeFloat(sm, "shelly.switch.frequency", "AC frequency", "Hz", channel, sw.Freq, now)
-			m.addSumFloat(sm, "shelly.switch.energy", "Total energy consumed", "Wh", channel, sw.AEnergy.Total, now)
-			if sw.Temperature.TC != 0 {
-				m.addGaugeFloat(sm, "shelly.device.temperature", "Device internal temperature", "Cel", channel, sw.Temperature.TC, now)
-			}
-		}
+		sm := rm.ScopeMetrics().AppendEmpty()
+		sm.Scope().SetName(scopeName)
+		sm.Scope().SetVersion(scopeVersion)
 
-		// Gen1: meters + relays
-		if len(d.status.Meters) > 0 {
-			rm := md.ResourceMetrics().AppendEmpty()
-			m.setResourceAttrs(rm.Resource(), d)
-
-			sm := rm.ScopeMetrics().AppendEmpty()
-			sm.Scope().SetName(scopeName)
-			sm.Scope().SetVersion(scopeVersion)
-
-			for i, meter := range d.status.Meters {
-				channel := fmt.Sprintf("%d", i)
-				m.addGaugeFloat(sm, "shelly.switch.power", "Active power", "W", channel, meter.Power, now)
-				m.addSumFloat(sm, "shelly.switch.energy", "Total energy consumed", "Wh", channel, meter.Total, now)
-				if i < len(d.status.Relays) {
-					m.addSwitchState(sm, channel, d.status.Relays[i].IsOn, now)
-				}
-			}
-
-			if d.status.Temperature != 0 {
-				m.addGaugeFloat(sm, "shelly.device.temperature", "Device internal temperature", "Cel", "0", d.status.Temperature, now)
-			}
+		if d.info.Gen == 1 {
+			m.marshalGen1(sm, d, channel, now)
+		} else {
+			m.marshalGen2(sm, d, channel, now)
 		}
 	}
 
 	return md, nil
+}
+
+func (m *shellyMarshaler) marshalGen1(sm pmetric.ScopeMetrics, d deviceData, channel string, now pcommon.Timestamp) {
+	ch := d.info.Channel
+	if ch >= len(d.status.Meters) {
+		m.logger.Debug("No Gen1 meter for channel",
+			zap.String("id", d.info.ID), zap.Int("channel", ch))
+		return
+	}
+	meter := d.status.Meters[ch]
+	m.addGaugeFloat(sm, "shelly.switch.power", "Active power", "W", channel, meter.Power, now)
+	m.addSumFloat(sm, "shelly.switch.energy", "Total energy consumed", "Wh", channel, meter.Total, now)
+
+	if ch < len(d.status.Relays) {
+		m.addSwitchState(sm, channel, d.status.Relays[ch].IsOn, now)
+	}
+	if d.status.Temperature != 0 {
+		m.addGaugeFloat(sm, "shelly.device.temperature", "Device internal temperature", "Cel", channel, d.status.Temperature, now)
+	}
+}
+
+func (m *shellyMarshaler) marshalGen2(sm pmetric.ScopeMetrics, d deviceData, channel string, now pcommon.Timestamp) {
+	sw, ok := d.status.Switches[channel]
+	if !ok {
+		m.logger.Debug("No Gen2+ switch status for channel",
+			zap.String("id", d.info.ID), zap.String("channel", channel))
+		return
+	}
+	m.addSwitchState(sm, channel, sw.Output, now)
+	m.addGaugeFloat(sm, "shelly.switch.power", "Active power", "W", channel, sw.APower, now)
+	m.addGaugeFloat(sm, "shelly.switch.voltage", "RMS voltage", "V", channel, sw.Voltage, now)
+	m.addGaugeFloat(sm, "shelly.switch.current", "RMS current", "A", channel, sw.Current, now)
+	m.addGaugeFloat(sm, "shelly.switch.frequency", "AC frequency", "Hz", channel, sw.Freq, now)
+	m.addSumFloat(sm, "shelly.switch.energy", "Total energy consumed", "Wh", channel, sw.AEnergy.Total, now)
+	if sw.Temperature.TC != 0 {
+		m.addGaugeFloat(sm, "shelly.device.temperature", "Device internal temperature", "Cel", channel, sw.Temperature.TC, now)
+	}
 }
 
 func (m *shellyMarshaler) setResourceAttrs(res pcommon.Resource, d deviceData) {

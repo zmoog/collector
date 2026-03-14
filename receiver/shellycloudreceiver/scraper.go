@@ -30,37 +30,51 @@ func (s *shellyScraper) start(_ context.Context, _ component.Host) error {
 }
 
 func (s *shellyScraper) scrape(_ context.Context) (pmetric.Metrics, error) {
-	devices, rooms, err := s.client.ListDevices()
+	channels, rooms, err := s.client.ListDevices()
 	if err != nil {
 		return pmetric.NewMetrics(), err
 	}
-	s.settings.Logger.Info("Fetched Shelly devices", zap.Int("count", len(devices)))
+	s.settings.Logger.Info("Fetched Shelly devices", zap.Int("channels", len(channels)))
 
-	var data []deviceData
-	for _, device := range devices {
-		if !device.Online {
-			s.settings.Logger.Debug("Skipping offline device",
-				zap.String("id", device.ID),
-				zap.String("name", device.Name))
+	// Fetch status once per physical device (multi-channel devices share a base ID).
+	statusByBaseID := make(map[string]*DeviceStatus)
+	for _, ch := range channels {
+		if !ch.CloudOnline {
 			continue
 		}
-
-		status, err := s.client.GetDeviceStatus(device.ID)
+		if _, already := statusByBaseID[ch.BaseID]; already {
+			continue
+		}
+		status, err := s.client.GetDeviceStatus(ch.BaseID)
 		if err != nil {
 			s.settings.Logger.Error("Failed to get device status",
-				zap.String("id", device.ID),
-				zap.String("name", device.Name),
+				zap.String("id", ch.BaseID),
 				zap.Error(err))
+			statusByBaseID[ch.BaseID] = nil
 			continue
 		}
+		statusByBaseID[ch.BaseID] = status
+	}
 
+	// Build one deviceData per channel entry.
+	var data []deviceData
+	for _, ch := range channels {
+		if !ch.CloudOnline {
+			s.settings.Logger.Debug("Skipping offline device",
+				zap.String("id", ch.ID),
+				zap.String("name", ch.Name))
+			continue
+		}
+		status := statusByBaseID[ch.BaseID]
+		if status == nil {
+			continue
+		}
 		roomName := ""
-		if room, ok := rooms[device.RoomID]; ok {
+		if room, ok := rooms[ch.RoomID]; ok {
 			roomName = room.Name
 		}
-
 		data = append(data, deviceData{
-			info:   device,
+			info:   ch,
 			room:   roomName,
 			status: status,
 		})
