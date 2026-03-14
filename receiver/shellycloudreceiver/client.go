@@ -161,7 +161,7 @@ func (c *Client) ListDevices() ([]DeviceInfo, map[int]Room, error) {
 		return nil, nil, fmt.Errorf("parse device list: %w", err)
 	}
 	if !dlr.IsOk {
-		return nil, nil, fmt.Errorf("Shelly Cloud API error on device list")
+		return nil, nil, fmt.Errorf("shelly cloud API error on device list")
 	}
 
 	rooms, err := c.listRooms()
@@ -199,7 +199,7 @@ func (c *Client) listRooms() (map[int]Room, error) {
 		return nil, fmt.Errorf("parse room list: %w", err)
 	}
 	if !rlr.IsOk {
-		return nil, fmt.Errorf("Shelly Cloud API error on room list")
+		return nil, fmt.Errorf("shelly cloud API error on room list")
 	}
 
 	rooms := make(map[int]Room, len(rlr.Data.Rooms))
@@ -226,7 +226,7 @@ func (c *Client) GetDeviceStatus(deviceID string) (*DeviceStatus, error) {
 		return nil, fmt.Errorf("parse device status: %w", err)
 	}
 	if !dsr.IsOk {
-		return nil, fmt.Errorf("Shelly Cloud API error on device status for %s: %s", deviceID, string(dsr.Errors))
+		return nil, fmt.Errorf("shelly cloud API error on device status for %s: %s", deviceID, string(dsr.Errors))
 	}
 	if !dsr.Data.Online {
 		return nil, nil
@@ -308,7 +308,7 @@ func (c *Client) get(path string, params url.Values) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	return io.ReadAll(resp.Body)
 }
