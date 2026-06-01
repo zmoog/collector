@@ -34,4 +34,5 @@ jobs:
           cd collector && go tool ko build . \
             --platform=linux/amd64,linux/arm64 \
             --bare \
+            --sbom=none \
             --tags "sha-$(git rev-parse --short HEAD),latest"
