@@ -4,7 +4,7 @@ go 1.25.4
 
 require (
 	github.com/stretchr/testify v1.11.1
-	github.com/zmoog/ws/v2 v2.3.0
+	github.com/zmoog/ws/v2 v2.5.0
 	go.opentelemetry.io/collector/component v1.48.0
 	go.opentelemetry.io/collector/component/componenttest v0.142.0
 	go.opentelemetry.io/collector/confmap v1.48.0
