@@ -1,32 +1,54 @@
 #!/bin/bash
 
+# Upgrade all OpenTelemetry modules, including SDKs, instrumentation and tools.
+# Review the diff and run the compatibility checks in docs/upgrading-otel.md.
 set -euo pipefail
 
-gomods=$(find . -maxdepth 4 -name 'go.mod' | grep -v tools)
+case "${1:-}" in
+    --help|-h)
+        echo "Usage: $0 [--dry-run]"
+        echo "Upgrade OpenTelemetry dependencies to their latest tagged releases."
+        exit 0
+        ;;
+    --dry-run|"") ;;
+    *) echo "Usage: $0 [--dry-run]" >&2; exit 2 ;;
+esac
+if [ "$#" -gt 1 ]; then
+    echo "Usage: $0 [--dry-run]" >&2
+    exit 2
+fi
 
-for gomod in ${gomods}; do
-    cd "$(dirname "${gomod}")"
+cd "$(dirname "$0")"
+root="$PWD"
+# Update receivers before the collector, which replaces them with local modules.
+# Isolate module resolution so the workspace cannot hide stale requirements.
+export GOWORK=off
+while IFS= read -r gomod; do
+    (
+        cd "$(dirname "$gomod")"
+        deps=()
+        while IFS= read -r pkg; do
+            deps+=("${pkg}@latest")
+        done < <(awk '
+            $1 == "require" {sub(/^[ \t]*require[ \t]+/, "")}
+            $1 ~ /^(go\.opentelemetry\.io\/|github\.com\/open-telemetry\/opentelemetry-collector(-contrib)?(\/|$))/ && $2 ~ /^v[0-9]/ {print $1}
+        ' go.mod | sort -u)
 
-    echo "=> Updating dependencies in ${gomod}"
+        if [ "${#deps[@]}" -eq 0 ]; then
+            echo "=> ${gomod}: No OTel dependencies found"
+            exit 0
+        fi
+        echo "=> ${gomod}"
+        printf '   go get'; printf ' %q' "${deps[@]}"; printf '\n'
+        if [ "${1:-}" != --dry-run ]; then
+            # Resolve the whole OTel family together, not one module at a time.
+            go get "${deps[@]}"
+            go mod tidy
+        fi
+    )
+done < <(find receiver -name go.mod -print | sort; find collector tools -name go.mod -print | sort)
 
-    OTEL_DEPS=$(grep -E '(github.com/open-telemetry/opentelemetry-collector|github.com/open-telemetry/opentelemetry-collector-contrib|go.opentelemetry.io/collector)' go.mod | grep -v '^\/\/' | awk '{print $1}' | sort -u || true)
-
-    if [ -n "${OTEL_DEPS}" ]; then
-        echo "   Found OTel dependencies:"
-        echo "${OTEL_DEPS}" | sed 's/^/      /'
-        echo "   Updating them..."
-
-        for pkg in ${OTEL_DEPS}; do
-            echo "      go get ${pkg}@latest"
-            go get "${pkg}@latest"
-        done
-
-        echo "   Running 'go mod tidy'..."
-        go mod tidy
-    else
-        echo "   No OTel dependencies found."
-    fi
-
-    cd -
-    echo ""
-done
+if [ "${1:-}" != --dry-run ]; then
+    GOWORK="$root/go.work" go work sync
+    echo "Dependencies updated. Run the compatibility checks in docs/upgrading-otel.md."
+fi

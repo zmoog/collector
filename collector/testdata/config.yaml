@@ -1,0 +1,61 @@
+# All registered components, including named receiver instances used by Helm.
+receivers:
+  toggltrack:
+    collection_interval: 5m
+    api_token: test-token
+  wavinsentio:
+    collection_interval: 1m
+    endpoint: https://localhost/wavin
+    username: test-user
+    password: test-password
+    web_api_key: test-key
+  zcsazzurro/thing1:
+    collection_interval: 5m
+    client_id: test-client
+    auth_key: test-key
+    thing_key: thing1
+  zcsazzurro/thing2:
+    collection_interval: 5m
+    client_id: test-client
+    auth_key: test-key
+    thing_key: thing2
+  shellycloud:
+    collection_interval: 1m
+    server_url: https://localhost
+    auth_key: test-key
+    request_delay: 500ms
+processors:
+  batch: {}
+exporters:
+  debug:
+    verbosity: detailed
+  elasticsearch:
+    endpoints: [https://localhost:9200]
+    headers:
+      Authorization: ApiKey test-key
+  otlp/elastic:
+    endpoint: localhost:4317
+extensions:
+  basicauth:
+    client_auth:
+      username: test-user
+      password: test-password
+  health_check:
+    endpoint: localhost:13133
+service:
+  extensions: [health_check, basicauth]
+  pipelines:
+    logs:
+      receivers: [toggltrack]
+      processors: [batch]
+      exporters: [debug, elasticsearch]
+    metrics:
+      receivers: [wavinsentio, zcsazzurro/thing1, zcsazzurro/thing2, shellycloud]
+      processors: [batch]
+      exporters: [debug, elasticsearch, otlp/elastic]
+  telemetry:
+    resource:
+      service.name: collector-test
+    logs:
+      level: info
+      encoding: json
