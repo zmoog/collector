@@ -13,13 +13,19 @@ import (
 )
 
 func main() {
+	if err := run(collectorSettings()); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func collectorSettings() otelcol.CollectorSettings {
 	info := component.BuildInfo{
 		Command:     "collector",
 		Description: "OTel Collector distribution",
 		Version:     "0.5",
 	}
 
-	set := otelcol.CollectorSettings{
+	return otelcol.CollectorSettings{
 		BuildInfo: info,
 		Factories: components,
 		ConfigProviderSettings: otelcol.ConfigProviderSettings{
@@ -32,15 +38,11 @@ func main() {
 			},
 		},
 		ProviderModules: map[string]string{
-			envprovider.NewFactory().Create(confmap.ProviderSettings{}).Scheme():  "go.opentelemetry.io/collector/confmap/provider/envprovider v1.42.0",
-			fileprovider.NewFactory().Create(confmap.ProviderSettings{}).Scheme(): "go.opentelemetry.io/collector/confmap/provider/fileprovider v1.42.0",
-			yamlprovider.NewFactory().Create(confmap.ProviderSettings{}).Scheme(): "go.opentelemetry.io/collector/confmap/provider/yamlprovider v1.42.0",
+			envprovider.NewFactory().Create(confmap.ProviderSettings{}).Scheme():  "go.opentelemetry.io/collector/confmap/provider/envprovider v1.70.0",
+			fileprovider.NewFactory().Create(confmap.ProviderSettings{}).Scheme(): "go.opentelemetry.io/collector/confmap/provider/fileprovider v1.70.0",
+			yamlprovider.NewFactory().Create(confmap.ProviderSettings{}).Scheme(): "go.opentelemetry.io/collector/confmap/provider/yamlprovider v1.70.0",
 		},
 		ConverterModules: []string{},
-	}
-
-	if err := run(set); err != nil {
-		log.Fatal(err)
 	}
 }
 

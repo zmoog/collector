@@ -28,21 +28,35 @@ generate:
 	# look inside the receiver directory
 	# and run mdatagen against the metadata.yaml
 	# found there
-	find receiver -name go.mod -execdir sh -c 'go tool mdatagen metadata.yaml && go mod tidy' \;
+	@find receiver -name go.mod -print | while IFS= read -r gomod; do \
+		(cd "$$(dirname "$$gomod")" && go tool mdatagen metadata.yaml && go mod tidy) || exit $$?; \
+	done
 
 .PHONY: staticcheck
 staticcheck:
 	# run staticcheck for all go
 	# directories that have a go.mod
 	# file present
-	find . -name go.mod -execdir go tool staticcheck ./... \;
+	@modules="$$(go list -m -f '{{.Dir}}')" || exit $$?; \
+	printf '%s\n' "$$modules" | while IFS= read -r module; do \
+		case "$$module" in */tools) continue ;; esac; \
+		(cd "$$module" && go tool staticcheck ./...) || exit $$?; \
+	done
+
+.PHONY: test-update-otel
+test-update-otel:
+	bash tests/update_otel_test.sh
 
 .PHONY: test
-test:
+test: test-update-otel
 	# run tests for all go
 	# directories that have a go.mod
 	# file present
-	find . -name go.mod -execdir go test ./... \;
+	@modules="$$(go list -m -f '{{.Dir}}')" || exit $$?; \
+	printf '%s\n' "$$modules" | while IFS= read -r module; do \
+		case "$$module" in */tools) continue ;; esac; \
+		(cd "$$module" && go test -race ./...) || exit $$?; \
+	done
 
 .PHONY: check
 check: generate staticcheck fmt
