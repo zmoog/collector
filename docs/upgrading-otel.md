@@ -1,6 +1,27 @@
 # Upgrading OpenTelemetry
 
-## Current upgrade (2026-10-27)
+## Current upgrade (2026-11-10)
+
+| Family | Before | After |
+| --- | --- | --- |
+| Collector experimental modules | v0.164.0 | v0.165.0 |
+| Collector stable modules | v1.70.0 | v1.71.0 |
+| Collector contrib components | v0.164.1 | v0.165.1 |
+| Go API/SDK | v1.47.0 | v1.47.0 (already latest) |
+| Collector builder / metadata generator | v0.164.0 | v0.165.0 |
+
+All six modules were updated with `./update_otel.sh`, including declared
+instrumentation, exporters and protocol dependencies. `confighttp` is now stable
+at v1.71.0. No receiver API migration was needed; regeneration with mdatagen
+v0.165.0 produced no code changes. Provider version strings in `collector/main.go`
+were updated to v1.71.0. The Go version remains unchanged.
+
+Verification passed: reproducible `make generate`, `make test`, `make staticcheck`,
+standalone `GOWORK=off go mod tidy -diff` for all six modules, standalone race tests
+for the collector and all receivers, and Linux amd64/arm64 builds. Live cloud
+services and production deployment were not tested.
+
+## Previous upgrade (2026-10-27)
 
 | Family | Before | After |
 | --- | --- | --- |
@@ -106,6 +127,10 @@ because it also rewrites unrelated pre-existing formatting.
 
 ## Upstream references
 
+- [Collector v0.165.0 release](https://github.com/open-telemetry/opentelemetry-collector/releases/tag/v0.165.0)
+- [Collector v0.165.0 API changelog](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.165.0/CHANGELOG-API.md)
+- [Collector contrib v0.165.0 release](https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.165.0)
+- [Collector contrib v0.165.1 release](https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.165.1)
 - [Collector v0.164.0 release](https://github.com/open-telemetry/opentelemetry-collector/releases/tag/v0.164.0)
 - [Collector API changelog](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.164.0/CHANGELOG-API.md)
 - [Collector contrib v0.164.1 release](https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.164.1)
