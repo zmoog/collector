@@ -44,7 +44,7 @@ jobs:
         with:
           go-version-file: go.work
       - name: golangci-lint ${{ matrix.modules }}
-        uses: golangci/golangci-lint-action@v8
+        uses: golangci/golangci-lint-action@v9
         with:
           working-directory: ${{ matrix.modules }}
           version: latest
