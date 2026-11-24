@@ -5,7 +5,7 @@ module github.com/zmoog/collector/collector
 go 1.26.0
 
 require (
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.164.1
+	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.166.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension v0.164.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.164.1
 	github.com/zmoog/collector/receiver/shellycloudreceiver v0.0.0
